@@ -1,8 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, Switch, Route } from "react-router-dom";
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { FetchCoins } from "../Api";
 import { useQuery } from "react-query";
+import Coin from "./Coin";
+import { Helmet } from "react-helmet";
+const MainC = styled.div`
+	max-width: 1000px;
+	margin: 0 auto;
+	display: flex;
+`;
+
 const Container = styled.div`
 	padding: 0px 20px;
 	max-width: 480px;
@@ -18,7 +26,7 @@ const Header = styled.header`
 
 const CoinsList = styled.ul``;
 
-const Coin = styled.li`
+const CoinC = styled.li`
 	background-color: white;
 	color: ${(props) => props.theme.bgColor};
 	border-radius: 15px;
@@ -65,30 +73,40 @@ const Loader = styled.span`
 function Coins() {
 	const { isLoading, data } = useQuery<ICoin[]>("allCoins", FetchCoins);
 	return (
-		<Container>
-			<Header>
-				<Title>코인</Title>
-			</Header>
-			{isLoading ? (
-				<Loader>Loading...</Loader>
-			) : (
-				<CoinsList>
-					{data?.map((coin) => (
-						<Coin key={coin.id}>
-							<Link
-								to={{
-									pathname: `/${coin.id}`,
-									state: { name: coin.name },
-								}}
-							>
-								<Img src={`https://cryptoicon-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`} />
-								{coin.name} &rarr;
-							</Link>
-						</Coin>
-					))}
-				</CoinsList>
-			)}
-		</Container>
+		<MainC>
+			<Container>
+				<Helmet>
+					<title>Coin</title>
+				</Helmet>
+				<Header>
+					<Title>코인</Title>
+				</Header>
+				{isLoading ? (
+					<Loader>Loading...</Loader>
+				) : (
+					<CoinsList>
+						{data?.map((coin) => (
+							<CoinC key={coin.id}>
+								<Link
+									to={{
+										pathname: `/${coin.id}`,
+										state: { name: coin.name },
+									}}
+								>
+									<Img src={`https://cryptoicon-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`} />
+									{coin.name} &rarr;
+								</Link>
+							</CoinC>
+						))}
+					</CoinsList>
+				)}
+			</Container>
+			<Switch>
+				<Route path={`/:coinId`}>
+					<Coin></Coin>
+				</Route>
+			</Switch>
+		</MainC>
 	);
 }
 export default Coins;

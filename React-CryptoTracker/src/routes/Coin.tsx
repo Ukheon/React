@@ -5,6 +5,7 @@ import { useQuery } from "react-query";
 import { FetchCoinInfo, FetchCoinPrice } from "../Api";
 import Chart from "./Chart";
 import Price from "./Price";
+import { Helmet } from "react-helmet";
 interface stateInterface {
 	name: string;
 }
@@ -70,6 +71,7 @@ const Overview = styled.div`
 	background-color: rgba(0, 0, 0, 0.5);
 	padding: 10px 20px;
 	border-radius: 10px;
+	margin-bottom: 5px;
 `;
 
 const OverviewItem = styled.div`
@@ -111,18 +113,18 @@ const Tab = styled.span<{ isActive: boolean }>`
 
 function Coin() {
 	const { coinId } = useParams<{ coinId: string }>();
-	const { isLoading: infoLoading, data: infoData } = useQuery<IInfo>("info", () => FetchCoinInfo(coinId));
-	const { isLoading: priceLoading, data: priceData } = useQuery<IPrice>("tricker", () => FetchCoinPrice(coinId));
+	const { isLoading: infoLoading, data: infoData } = useQuery<IInfo>(["info", coinId], () => FetchCoinInfo(coinId));
+	const { isLoading: priceLoading, data: priceData } = useQuery<IPrice>(["tricker", coinId], () => FetchCoinPrice(coinId));
 	const chartMatch = useRouteMatch("/:coinId/chart");
 	const priceMatch = useRouteMatch("/:coinId/price");
 	const { state } = useLocation<stateInterface>();
 	const loading = infoLoading || priceLoading;
 	return (
 		<Container>
+			<Helmet>
+				<title>{state.name ? state.name : "Coin"}</title>
+			</Helmet>
 			<Header>
-				<Link to="/">
-					<div>Go Home</div>
-				</Link>
 				<Title>{state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
 			</Header>
 			{loading ? (
@@ -139,8 +141,8 @@ function Coin() {
 							<span>${infoData?.symbol}</span>
 						</OverviewItem>
 						<OverviewItem>
-							<span>Open Source:</span>
-							<span>{infoData?.open_source ? "Yes" : "No"}</span>
+							<span>Price Now</span>
+							<span>{priceData?.quotes.USD.price.toFixed(3)}</span>
 						</OverviewItem>
 					</Overview>
 					<Description>{infoData?.description}</Description>
@@ -156,18 +158,27 @@ function Coin() {
 					</Overview>
 					<Tabs>
 						<Tab isActive={chartMatch !== null}>
-							<Link to={`/${coinId}/chart`}>Chart</Link>
+							<Link
+								to={{
+									pathname: `/${coinId}/chart`,
+									state: {
+										price: priceData?.quotes.USD,
+									},
+								}}
+							>
+								Chart
+							</Link>
 						</Tab>
 						<Tab isActive={priceMatch !== null}>
 							<Link to={`/${coinId}/price`}>Price</Link>
 						</Tab>
 					</Tabs>
 					<Switch>
-						<Route path={`/${coinId}/price`}>
-							<Price coinId={coinId}></Price>
-						</Route>
 						<Route path={`/${coinId}/chart`}>
 							<Chart coinId={coinId}></Chart>
+						</Route>
+						<Route path={`/${coinId}/price`}>
+							<Price coinId={coinId} priceData={priceData?.quotes.USD}></Price>
 						</Route>
 					</Switch>
 				</>
@@ -176,3 +187,4 @@ function Coin() {
 	);
 }
 export default Coin;
+export { Overview, OverviewItem };

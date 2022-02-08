@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import { FetchCoinHistorycal } from "../Api";
 import ApexChart from "react-apexcharts";
+import Price from "./Price";
 interface IChart {
 	coinId: string;
 }
@@ -14,27 +15,42 @@ interface IHistory {
 	time_close: string;
 	time_open: string;
 }
-
 function Chart({ coinId }: IChart) {
 	const { isLoading, data } = useQuery<IHistory[]>(["historyCal", coinId], () => FetchCoinHistorycal(coinId));
+	let candleData;
+	let lineData;
+	if (data !== undefined) {
+		console.log(data, "sibal");
+		candleData = data!.map((price) => [Date.parse(price.time_open), price.high.toFixed(3), price.open.toFixed(3), price.low.toFixed(3), price.close.toFixed(3)]);
+		lineData = data!.map((price) => [Date.parse(price.time_open), price.high.toFixed(3)]);
+	}
 	return (
 		<div>
-			{isLoading ? (
+			{isLoading && data === undefined ? (
 				"Loading . . ."
 			) : (
 				<ApexChart
-					type="line"
 					series={[
 						{
-							name: "Price",
-							data: data?.map((price) => price.close),
+							name: "candle",
+							type: "candlestick",
+							data: candleData,
+						},
+						{
+							name: "line",
+							type: "line",
+							data: lineData,
 						},
 					]}
 					options={{
 						theme: {
 							mode: "dark",
 						},
+						dataLabels: {
+							enabled: false,
+						},
 						chart: {
+							type: "candlestick",
 							height: 300,
 							width: 500,
 							toolbar: {
@@ -42,18 +58,19 @@ function Chart({ coinId }: IChart) {
 							},
 							background: "transparent",
 						},
-						grid: { show: false },
+						grid: { show: true },
 						stroke: {
 							curve: "smooth",
-							width: 4,
+							width: 2,
 						},
 						yaxis: {
-							show: false,
+							show: true,
 						},
 						xaxis: {
-							axisBorder: { show: false },
+							axisBorder: { show: true },
 							axisTicks: { show: false },
-							labels: { show: false },
+							type: "datetime",
+							labels: { show: true },
 						},
 					}}
 				/>
