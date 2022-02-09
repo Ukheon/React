@@ -170,7 +170,11 @@ function Coin() {
 							</Link>
 						</Tab>
 						<Tab isActive={priceMatch !== null}>
-							<Link to={`/${coinId}/price`}>Price</Link>
+							<Link to={{
+								pathname: `/${coinId}/price`,
+								state: {
+									coinId: coinId,
+								}}}>Price</Link>
 						</Tab>
 					</Tabs>
 					<Switch>

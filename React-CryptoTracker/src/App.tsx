@@ -1,10 +1,12 @@
 import React from "react";
 import Circle from "./Circle";
 import Form from "./Form";
-import styled, { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import Router from "./Router";
 import { ReactQueryDevtools } from "react-query/devtools";
-
+import { theme, lightTheme, darkTheme } from "./theme";
+import { useRecoilValue } from "recoil";
+import { isDarkAtom } from "./atoms";
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 html, body, div, span, applet, object, iframe,
@@ -20,46 +22,46 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
 main, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, main, menu, nav, section {
-  display: block;
+	display: block;
 }
 /* HTML5 hidden-attribute fix for newer browsers */
 *[hidden] {
-    display: none;
+		display: none;
 }
 body {
-  line-height: 1;
+	line-height: 1;
 }
 menu, ol, ul {
-  list-style: none;
+	list-style: none;
 }
 blockquote, q {
-  quotes: none;
+	quotes: none;
 }
 blockquote:before, blockquote:after,
 q:before, q:after {
-  content: '';
-  content: none;
+	content: '';
+	content: none;
 }
 table {
-  border-collapse: collapse;
-  border-spacing: 0;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 body {
 	font-weight: 300;
-  font-family: 'Source Sans Pro', sans-serif;
-  background-color:${(props) => props.theme.bgColor};
-  color:${(props) => props.theme.textColor};
-  line-height: 1.2;
+	font-family: 'Source Sans Pro', sans-serif;
+	background-color:${(props) => props.theme.bgColor};
+	color:${(props) => props.theme.textColor};
+	line-height: 1.2;
 }
 a {
 	text-decoration: none;
@@ -68,18 +70,16 @@ a {
 `;
 
 function App() {
-	return (
-		<>
-			<GlobalStyle />
-			<Router />
-			{/*<ReactQueryDevtools initialIsOpen={false} />*/}
-		</>
-		//<Father>
-		//	<Form></Form>
-		//	<Circle bgColor="teal"></Circle>
-		//	<Circle bgColor="red" borderColor="black" text="hi every one"></Circle>
-		//</Father>
-	);
+    const isDark = useRecoilValue(isDarkAtom);
+    return (
+        <>
+            <ThemeProvider theme={isDark ? lightTheme : darkTheme}>
+                <GlobalStyle />
+                <Router />
+                <Router />
+                <ReactQueryDevtools initialIsOpen={true} />
+            </ThemeProvider>
+        </>
+    );
 }
-
 export default App;

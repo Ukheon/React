@@ -1,5 +1,4 @@
-import { useQuery } from "react-query";
-import { FetchCoinHistorycal } from "../Api";
+
 import { Overview, OverviewItem } from "./Coin";
 import styled from "styled-components";
 interface IPrice {
@@ -25,17 +24,6 @@ interface IPrice {
 	};
 }
 
-interface IHistory {
-	close: number;
-	high: number;
-	low: number;
-	market_cap: number;
-	open: number;
-	volume: number;
-	time_close: string;
-	time_open: string;
-}
-
 interface IRepeat {
 	time: string;
 	percent?: any;
@@ -47,7 +35,6 @@ const Accent = styled.span<{ flag?: boolean }>`
 
 const Percent = styled.span<{ flag: boolean }>`
 	color: ${(props) => (props.flag ? "red" : "blue")};
-	/*opacity: 0.8;*/
 `;
 
 const RepeatOverview = ({ time, percent }: IRepeat) => {
@@ -56,8 +43,8 @@ const RepeatOverview = ({ time, percent }: IRepeat) => {
 	return (
 		<Overview>
 			<OverviewItem>
-				{/*<span>Time</span>*/}
-				<a>{time}</a>
+				{/* <span>Time</span> */}
+				<span>{time}</span>
 			</OverviewItem>
 			<OverviewItem>
 				{/*<span>Percent</span>*/}
