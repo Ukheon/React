@@ -71,6 +71,7 @@ a {
 
 function App() {
     const isDark = useRecoilValue(isDarkAtom);
+    console.log("hi");
     return (
         <>
             <ThemeProvider theme={isDark ? lightTheme : darkTheme}>
