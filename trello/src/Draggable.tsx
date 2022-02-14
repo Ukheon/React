@@ -1,7 +1,9 @@
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import React from "react";
 import styled from "styled-components";
+import { useSetRecoilState } from "recoil";
+import { toDoState } from "./Atoms";
 interface IDraggableCard {
     toDo: string;
     index: number;
@@ -19,10 +21,7 @@ const Card = styled.div<{ isDraggingOver: boolean }>`
     box-shadow: ${(props) => (props.isDraggingOver ? "2px 2px" : "none")};
 
     > div:first-child {
-        width: 85%;
-    }
-    > div:last-child {
-        width: 15%;
+        width: 100%;
     }
 `;
 
@@ -38,7 +37,6 @@ const DraggableCard = ({ boardId, toDo, index }: IDraggableCard) => {
                         {...magic.draggableProps}
                     >
                         <div>{toDo}</div>
-                        <div>➖</div>
                     </Card>
                 )}
             </Draggable>

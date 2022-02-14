@@ -23,6 +23,17 @@ export const toDoState = atom<IToDoState>({
     },
 });
 
+export const toDoChange = selector<IToDoState>({
+    key: "toDoChange",
+    get: ({ get }) => {
+        return get(toDoState);
+    },
+    set: ({ set }, newValue) => {
+        console.log(newValue);
+        set(toDoState, newValue);
+    },
+});
+
 export const hourSelector = selector<number>({
     key: "hours",
     get: ({ get }) => {
