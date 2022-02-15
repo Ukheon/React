@@ -226,19 +226,50 @@ function App() {
             });
         }
     }, []);
+
     const onDragEnd = ({ type, destination, source }: DropResult) => {
-        console.log(destination, source);
+        // console.log(destination, source, type);
+        console.log(destination, "목적지");
+        console.log(source, "이벤트 발생지점");
         // console.log(event);
         if (!destination) return;
         if (type === "DEFAULT") {
-            setToDo((data) => {
-                console.log(data, "data");
-                const copy = [...data];
-                const temp = data.filter((data) => data.name === source.droppableId);
-                // temp 에는 옮기는애가 담겨있다.
-                console.log(temp, "temp");
-                console.log(temp[0].name);
-                return data;
+            setToDo((allData) => {
+                let removeIdx: number;
+                for (let i: number = 0; i < allData.length; i++) {
+                    if (allData[i].name === source.droppableId) removeIdx = i;
+                }
+                const copy = allData.map((data, index) => {
+                    console.log("data", data);
+                    // 지울꺼임
+                    if (data.name === source.droppableId) {
+                        const temp = [...data.item];
+
+                        temp.splice(source.index, 1);
+                        const res = {
+                            id: data.id,
+                            name: data.name,
+                            item: [...temp],
+                        };
+                        console.log(data, "data");
+                        console.log(res, "res");
+                        return res;
+                    }
+                    // 넣을곳
+                    if (data.name === destination.droppableId) {
+                        const temp = [...data.item];
+                        temp.splice(destination.index, 0, allData[removeIdx].item[source.index]);
+                        const res = {
+                            id: data.id,
+                            name: data.name,
+                            item: [...temp],
+                        };
+                        return res;
+                    }
+                    return data;
+                });
+
+                return copy;
             });
         } else {
             setToDo((data) => {
@@ -249,46 +280,6 @@ function App() {
                 return copy;
             });
         }
-        // if (destination?.droppableId === "0") {
-        //     setToDo((boards) => {
-        //         const copyBoards = [...boards[source.droppableId]];
-        //         copyBoards.splice(source.index, 1);
-        //         const res = { ...boards, [source.droppableId]: copyBoards };
-        //         saveData(res);
-        //         return res;
-        //     });
-        //     return;
-        // }
-        // if (!destination) return;
-        // if (destination.droppableId === source.droppableId) {
-        //     setToDo((boards) => {
-        //         localStorage.setItem("data", JSON.stringify(toDo));
-        //         console.log(JSON.parse(localStorage.getItem("data") as any));
-        //         const copyBoard = [...boards[source.droppableId]];
-        //         copyBoard.splice(source.index, 1);
-        //         copyBoard.splice(destination?.index, 0, boards[source.droppableId][source.index]);
-        //         const res = {
-        //             ...boards,
-        //             [source.droppableId]: copyBoard,
-        //         };
-        //         saveData(res);
-        //         return res;
-        //     });
-        // } else {
-        //     setToDo((boards) => {
-        //         const outBoard = [...boards[source.droppableId]];
-        //         const addBoard = [...boards[destination.droppableId]];
-        //         addBoard.splice(destination.index, 0, boards[source.droppableId][source.index]);
-        //         outBoard.splice(source.index, 1);
-        //         const res = {
-        //             ...boards,
-        //             [destination.droppableId]: addBoard,
-        //             [source.droppableId]: outBoard,
-        //         };
-        //         saveData(res);
-        //         return res;
-        //     });
-        // }
     };
     const addBoard = (data: any) => {
         if (value.length <= 0) return;
@@ -307,6 +298,7 @@ function App() {
     const onChange = (event: React.FormEvent<HTMLInputElement>) => {
         setValue(event.currentTarget.value);
     };
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <DeleteToDo>
@@ -338,7 +330,7 @@ function App() {
                 <Boards>
                     {toDo.map((data, index) => (
                         // toDos = [ { id, text}] 를 주는중.
-                        <Board key={data.name} index={index} toDos={data.item!} boardId={data.name} />
+                        <Board key={data.name} id={data.id} index={index} toDos={data.item!} boardId={data.name} />
                     ))}
                 </Boards>
             </Wrapper>

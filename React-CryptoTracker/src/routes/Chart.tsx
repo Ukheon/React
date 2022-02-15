@@ -22,7 +22,6 @@ function Chart({ coinId }: IChart) {
     let candleData;
     let lineData;
     if (data !== undefined) {
-        console.log(data, "sibal");
         candleData = data!.map((price) => [
             Date.parse(price.time_open),
             price.high.toFixed(3),

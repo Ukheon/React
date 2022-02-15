@@ -120,13 +120,9 @@ function Coin() {
     const chartMatch = useRouteMatch("/:coinId/chart");
     const priceMatch = useRouteMatch("/:coinId/price");
     const { state } = useLocation<stateInterface>();
-    // console.log(state);
     const loading = infoLoading || priceLoading;
     return (
         <Container>
-            {/* <Helmet>
-                <title>{state.name ? state.name : "Coin"}</title>
-            </Helmet> */}
             <Header>
                 <Title>{state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
             </Header>

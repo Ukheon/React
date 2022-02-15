@@ -100,7 +100,6 @@
         "@types/react-router-dom": "^5.3.3",
         "@types/styled-components": "^5.1.22"
     },
-    "homepage": "https://ukheon.github.io/react/",
     "jest": {
         "roots": [
             "<rootDir>/src"
@@ -154,5 +153,6 @@
         "presets": [
             "react-app"
         ]
-    }
+    },
+    "homepage": "https://ukheon.github.io/React/"
 }

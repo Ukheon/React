@@ -20,13 +20,6 @@ export interface IToDoState {
     // };
 }
 
-const test = [
-    {
-        id: 0,
-        value: 10,
-    },
-];
-
 export const toDoState = atom<IToDoState[]>({
     key: "toDo",
     default: [
@@ -41,19 +34,19 @@ export const toDoState = atom<IToDoState[]>({
             item: [
                 {
                     id: 1,
-                    text: "hi",
+                    text: "1",
                 },
                 {
                     id: 2,
-                    text: "hi",
+                    text: "2",
                 },
                 {
                     id: 3,
-                    text: "hi",
+                    text: "3",
                 },
                 {
                     id: 4,
-                    text: "hi",
+                    text: "4",
                 },
             ],
         },

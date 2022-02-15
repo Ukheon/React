@@ -47,6 +47,7 @@ interface IBoardProps {
     toDos: IToDo[];
     boardId: string;
     index: number;
+    id: number;
 }
 
 const Form = styled.form`
@@ -90,22 +91,56 @@ interface IUseForm {
     [toDo: string]: string;
 }
 
-function Board({ toDos, boardId, index }: IBoardProps) {
+function Board({ toDos, boardId, index, id }: IBoardProps) {
     const { register, setValue, handleSubmit } = useForm<IUseForm>();
     const [toDo, setTodo] = useRecoilState(toDoState);
     const changeToDo = useSetRecoilState(toDoChange);
     const onValue = (data: IUseForm) => {
-        // const newToDo = {
-        //     id: Date.now(),
-        //     text: data[boardId],
-        // };
-        // setTodo((toDo) => {
-        //     console.log(toDo);
-        //     const res = { ...toDo, [boardId]: [...toDo[boardId], newToDo] };
-        //     // saveData(res);
-        //     return {};
-        // });
-        // setValue(boardId, "");
+        console.log(data[boardId]);
+        const time = Date.now();
+        const newToDo = {
+            id: time,
+            name: boardId,
+            item: [
+                {
+                    id: time + 1,
+                    text: data[boardId],
+                },
+            ],
+        };
+        setTodo((toDo) => {
+            console.log(toDo);
+            let idx: number;
+            for (let i = 0; i < toDo.length; i++) {
+                if (toDo[i].name === boardId) {
+                    idx = i;
+                }
+            }
+            const copy = toDo.filter((data) => data.name !== boardId);
+            const temp = toDo.filter((data) => data.name === boardId);
+            const test = [...temp[0].item];
+            test.unshift({
+                id: time + 1,
+                text: data[boardId],
+            });
+            const newToDo = {
+                id: id,
+                name: boardId,
+                item: test,
+            };
+            //     {
+            //     id: 3,
+            //     name: "DONE",
+            //     item: [
+            //         {
+            //             id: 2,
+            //             text: "hi",
+            //         },
+            //     ],
+            // },
+            return [...toDo];
+        });
+        setValue(boardId, "");
     };
     const deleteBoard = () => {
         // const copyToDo = { ...toDo };
