@@ -124,7 +124,7 @@ function Board({ toDos, boardId, index }: IBoardProps) {
         // saveData(copyToDo);
         // changeToDo(copyToDo);
     };
-    // 뭐냐시발
+    // 뭐냐시발 kkkkk
     console.log(toDos, "toDos");
     return (
         <>
