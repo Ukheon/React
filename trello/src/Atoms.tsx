@@ -6,24 +6,71 @@ export const minutesState = atom({
 });
 
 export interface IToDo {
-    text: string;
-    id: number;
+    id?: number;
+    text?: string;
 }
 
 export interface IToDoState {
-    [key: string]: IToDo[];
+    id: number;
+    name: string;
+    item: IToDo[];
+    // {
+    //     id?: number;
+    //     text?: string;
+    // };
 }
 
-export const toDoState = atom<IToDoState>({
-    key: "toDo",
-    default: {
-        "TO DO": [],
-        DOING: [],
-        DONE: [],
+const test = [
+    {
+        id: 0,
+        value: 10,
     },
+];
+
+export const toDoState = atom<IToDoState[]>({
+    key: "toDo",
+    default: [
+        {
+            id: 1,
+            name: "TO DO",
+            item: [],
+        },
+        {
+            id: 2,
+            name: "DOING",
+            item: [
+                {
+                    id: 1,
+                    text: "hi",
+                },
+                {
+                    id: 2,
+                    text: "hi",
+                },
+                {
+                    id: 3,
+                    text: "hi",
+                },
+                {
+                    id: 4,
+                    text: "hi",
+                },
+            ],
+        },
+        {
+            id: 3,
+            name: "DONE",
+            item: [
+                {
+                    id: 2,
+                    text: "hi",
+                },
+            ],
+        },
+    ],
 });
 
-export const toDoChange = selector<IToDoState>({
+export const toDoChange = selector<IToDoState[]>({
     key: "toDoChange",
     get: ({ get }) => {
         return get(toDoState);

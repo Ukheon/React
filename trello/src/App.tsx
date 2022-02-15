@@ -78,6 +78,143 @@ const Check = styled.div`
     height: 100px;
 `;
 
+const testData = [
+    {
+        id: 1,
+        content: "item 1 content",
+        subItems: [
+            {
+                id: 10,
+                content: "SubItem 10 content",
+            },
+            {
+                id: 11,
+                content: "SubItem 11 content",
+            },
+        ],
+    },
+    {
+        id: 2,
+        content: "item 2 content",
+        subItems: [
+            {
+                id: 20,
+                content: "SubItem 20 content",
+            },
+            {
+                id: 21,
+                content: "SubItem 21 content",
+            },
+        ],
+    },
+];
+
+const DropableArea = styled.div`
+    width: 600px;
+    height: 500px;
+    margin: 0 auto;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+`;
+
+const SubDropableArea = styled.div`
+    width: 100%;
+    height: 400px;
+    color: red;
+`;
+
+const DragableArea = styled.div`
+    width: 45%;
+    height: 400px;
+    gap: 10px;
+    background-color: gray;
+`;
+const SubDraggableArea = styled.div`
+    background-color: blue;
+`;
+
+// const App = () => {
+//     const DragEnd = (event: DropResult) => {};
+//     return (
+//         <>
+//             <DragDropContext onDragEnd={DragEnd}>
+//                 <Droppable droppableId="droppable" type={"parent"}>
+//                     {(dropProvider) => (
+//                         <>
+//                             <DropableArea ref={dropProvider.innerRef} {...dropProvider.droppableProps}>
+//                                 {testData.map((item, index) => {
+//                                     return (
+//                                         <>
+//                                             <Draggable key={item.id} draggableId={item.id + ""} index={index}>
+//                                                 {(dragProvider) => (
+//                                                     <>
+//                                                         <DragableArea
+//                                                             ref={dragProvider.innerRef}
+//                                                             {...dragProvider.draggableProps}
+//                                                         >
+//                                                             {item.content}
+//                                                             <span
+//                                                                 style={{
+//                                                                     border: "1px solid blue",
+//                                                                 }}
+//                                                                 {...dragProvider.dragHandleProps}
+//                                                             >
+//                                                                 MOVE
+//                                                             </span>
+//                                                             <Droppable droppableId={item.id + ""} type={"children"}>
+//                                                                 {(childPro) => (
+//                                                                     <>
+//                                                                         <SubDropableArea ref={childPro.innerRef}>
+//                                                                             {item.subItems.map((subItem, index) => (
+//                                                                                 <>
+//                                                                                     <>
+//                                                                                         <Draggable
+//                                                                                             key={subItem.id}
+//                                                                                             draggableId={
+//                                                                                                 subItem.id + ""
+//                                                                                             }
+//                                                                                             index={index}
+//                                                                                         >
+//                                                                                             {(provider) => (
+//                                                                                                 <>
+//                                                                                                     <SubDraggableArea
+//                                                                                                         ref={
+//                                                                                                             provider.innerRef
+//                                                                                                         }
+//                                                                                                         {...provider.dragHandleProps}
+//                                                                                                         {...provider.draggableProps}
+//                                                                                                     >
+//                                                                                                         {
+//                                                                                                             subItem.content
+//                                                                                                         }
+//                                                                                                     </SubDraggableArea>
+//                                                                                                 </>
+//                                                                                             )}
+//                                                                                         </Draggable>
+//                                                                                     </>
+//                                                                                 </>
+//                                                                             ))}
+//                                                                         </SubDropableArea>
+//                                                                     </>
+//                                                                 )}
+//                                                             </Droppable>
+//                                                         </DragableArea>
+//                                                     </>
+//                                                 )}
+//                                             </Draggable>
+//                                         </>
+//                                     );
+//                                 })}
+//                             </DropableArea>
+//                         </>
+//                     )}
+//                 </Droppable>
+//             </DragDropContext>
+//         </>
+//     );
+// };
+
 function App() {
     const [toDo, setToDo] = useRecoilState(toDoState);
     const newBoard = useSetRecoilState(toDoChange);
@@ -89,56 +226,81 @@ function App() {
             });
         }
     }, []);
-    const onDragEnd = ({ destination, source }: DropResult) => {
+    const onDragEnd = ({ type, destination, source }: DropResult) => {
         console.log(destination, source);
-        if (destination?.droppableId === "0") {
-            setToDo((boards) => {
-                const copyBoards = [...boards[source.droppableId]];
-                copyBoards.splice(source.index, 1);
-                const res = { ...boards, [source.droppableId]: copyBoards };
-                saveData(res);
-                return res;
-            });
-            return;
-        }
+        // console.log(event);
         if (!destination) return;
-        if (destination.droppableId === source.droppableId) {
-            setToDo((boards) => {
-                localStorage.setItem("data", JSON.stringify(toDo));
-                console.log(JSON.parse(localStorage.getItem("data") as any));
-                const copyBoard = [...boards[source.droppableId]];
-                copyBoard.splice(source.index, 1);
-                copyBoard.splice(destination?.index, 0, boards[source.droppableId][source.index]);
-                const res = {
-                    ...boards,
-                    [source.droppableId]: copyBoard,
-                };
-                saveData(res);
-                return res;
+        if (type === "DEFAULT") {
+            setToDo((data) => {
+                console.log(data, "data");
+                const copy = [...data];
+                const temp = data.filter((data) => data.name === source.droppableId);
+                // temp 에는 옮기는애가 담겨있다.
+                console.log(temp, "temp");
+                console.log(temp[0].name);
+                return data;
             });
         } else {
-            setToDo((boards) => {
-                const outBoard = [...boards[source.droppableId]];
-                const addBoard = [...boards[destination.droppableId]];
-                addBoard.splice(destination.index, 0, boards[source.droppableId][source.index]);
-                outBoard.splice(source.index, 1);
-                const res = {
-                    ...boards,
-                    [destination.droppableId]: addBoard,
-                    [source.droppableId]: outBoard,
-                };
-                saveData(res);
-                return res;
+            setToDo((data) => {
+                const copy = [...data];
+                copy.splice(source.index, 1);
+                const temp = data.filter((data) => data.name === source.droppableId);
+                copy.splice(destination!.index, 0, temp[0]);
+                return copy;
             });
         }
+        // if (destination?.droppableId === "0") {
+        //     setToDo((boards) => {
+        //         const copyBoards = [...boards[source.droppableId]];
+        //         copyBoards.splice(source.index, 1);
+        //         const res = { ...boards, [source.droppableId]: copyBoards };
+        //         saveData(res);
+        //         return res;
+        //     });
+        //     return;
+        // }
+        // if (!destination) return;
+        // if (destination.droppableId === source.droppableId) {
+        //     setToDo((boards) => {
+        //         localStorage.setItem("data", JSON.stringify(toDo));
+        //         console.log(JSON.parse(localStorage.getItem("data") as any));
+        //         const copyBoard = [...boards[source.droppableId]];
+        //         copyBoard.splice(source.index, 1);
+        //         copyBoard.splice(destination?.index, 0, boards[source.droppableId][source.index]);
+        //         const res = {
+        //             ...boards,
+        //             [source.droppableId]: copyBoard,
+        //         };
+        //         saveData(res);
+        //         return res;
+        //     });
+        // } else {
+        //     setToDo((boards) => {
+        //         const outBoard = [...boards[source.droppableId]];
+        //         const addBoard = [...boards[destination.droppableId]];
+        //         addBoard.splice(destination.index, 0, boards[source.droppableId][source.index]);
+        //         outBoard.splice(source.index, 1);
+        //         const res = {
+        //             ...boards,
+        //             [destination.droppableId]: addBoard,
+        //             [source.droppableId]: outBoard,
+        //         };
+        //         saveData(res);
+        //         return res;
+        //     });
+        // }
     };
     const addBoard = (data: any) => {
         if (value.length <= 0) return;
-        const res = {
+        const str = value;
+        const res = [
             ...toDo,
-            [value]: [],
-        };
-        saveData(res);
+            {
+                id: Date.now(),
+                name: value,
+                item: [],
+            },
+        ];
         newBoard(res);
         setValue("");
     };
@@ -151,7 +313,6 @@ function App() {
                 <Droppable droppableId="0">
                     {(magic) => (
                         <div ref={magic.innerRef}>
-                            gg
                             <Draggable draggableId="0" index={0}>
                                 {(hole) => (
                                     <>
@@ -175,8 +336,9 @@ function App() {
             </DeleteToDo>
             <Wrapper>
                 <Boards>
-                    {Object.keys(toDo).map((boardId, index) => (
-                        <Board key={boardId} index={index} toDos={toDo[boardId]} boardId={boardId} />
+                    {toDo.map((data, index) => (
+                        // toDos = [ { id, text}] 를 주는중.
+                        <Board key={data.name} index={index} toDos={data.item!} boardId={data.name} />
                     ))}
                 </Boards>
             </Wrapper>
