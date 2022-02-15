@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { IToDoState, toDoState, toDoChange } from "./Atoms";
+import { IToDoState, toDoState, toDoChange, testToDo, ITest } from "./Atoms";
 import { DragDropContext, Droppable, DropResult, Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import DraggableCard from "./Draggable";
@@ -134,208 +134,107 @@ const SubDraggableArea = styled.div`
     background-color: blue;
 `;
 
-// const App = () => {
-//     const DragEnd = (event: DropResult) => {};
-//     return (
-//         <>
-//             <DragDropContext onDragEnd={DragEnd}>
-//                 <Droppable droppableId="droppable" type={"parent"}>
-//                     {(dropProvider) => (
-//                         <>
-//                             <DropableArea ref={dropProvider.innerRef} {...dropProvider.droppableProps}>
-//                                 {testData.map((item, index) => {
-//                                     return (
-//                                         <>
-//                                             <Draggable key={item.id} draggableId={item.id + ""} index={index}>
-//                                                 {(dragProvider) => (
-//                                                     <>
-//                                                         <DragableArea
-//                                                             ref={dragProvider.innerRef}
-//                                                             {...dragProvider.draggableProps}
-//                                                         >
-//                                                             {item.content}
-//                                                             <span
-//                                                                 style={{
-//                                                                     border: "1px solid blue",
-//                                                                 }}
-//                                                                 {...dragProvider.dragHandleProps}
-//                                                             >
-//                                                                 MOVE
-//                                                             </span>
-//                                                             <Droppable droppableId={item.id + ""} type={"children"}>
-//                                                                 {(childPro) => (
-//                                                                     <>
-//                                                                         <SubDropableArea ref={childPro.innerRef}>
-//                                                                             {item.subItems.map((subItem, index) => (
-//                                                                                 <>
-//                                                                                     <>
-//                                                                                         <Draggable
-//                                                                                             key={subItem.id}
-//                                                                                             draggableId={
-//                                                                                                 subItem.id + ""
-//                                                                                             }
-//                                                                                             index={index}
-//                                                                                         >
-//                                                                                             {(provider) => (
-//                                                                                                 <>
-//                                                                                                     <SubDraggableArea
-//                                                                                                         ref={
-//                                                                                                             provider.innerRef
-//                                                                                                         }
-//                                                                                                         {...provider.dragHandleProps}
-//                                                                                                         {...provider.draggableProps}
-//                                                                                                     >
-//                                                                                                         {
-//                                                                                                             subItem.content
-//                                                                                                         }
-//                                                                                                     </SubDraggableArea>
-//                                                                                                 </>
-//                                                                                             )}
-//                                                                                         </Draggable>
-//                                                                                     </>
-//                                                                                 </>
-//                                                                             ))}
-//                                                                         </SubDropableArea>
-//                                                                     </>
-//                                                                 )}
-//                                                             </Droppable>
-//                                                         </DragableArea>
-//                                                     </>
-//                                                 )}
-//                                             </Draggable>
-//                                         </>
-//                                     );
-//                                 })}
-//                             </DropableArea>
-//                         </>
-//                     )}
-//                 </Droppable>
-//             </DragDropContext>
-//         </>
-//     );
-// };
-
-function App() {
-    const [toDo, setToDo] = useRecoilState(toDoState);
-    const newBoard = useSetRecoilState(toDoChange);
-    const [value, setValue] = useState<string>("");
-    useEffect(() => {
-        if (getData() !== null) {
-            setToDo((data) => {
-                return getData();
-            });
-        }
-    }, []);
-
-    const onDragEnd = ({ type, destination, source }: DropResult) => {
-        // console.log(destination, source, type);
-        console.log(destination, "목적지");
-        console.log(source, "이벤트 발생지점");
-        // console.log(event);
-        if (!destination) return;
-        if (type === "DEFAULT") {
-            setToDo((allData) => {
-                let removeIdx: number;
-                for (let i: number = 0; i < allData.length; i++) {
-                    if (allData[i].name === source.droppableId) removeIdx = i;
-                }
-                const copy = allData.map((data, index) => {
-                    console.log("data", data);
-                    // 지울꺼임
-                    if (data.name === source.droppableId) {
-                        const temp = [...data.item];
-
-                        temp.splice(source.index, 1);
-                        const res = {
-                            id: data.id,
-                            name: data.name,
-                            item: [...temp],
-                        };
-                        console.log(data, "data");
-                        console.log(res, "res");
-                        return res;
-                    }
-                    // 넣을곳
-                    if (data.name === destination.droppableId) {
-                        const temp = [...data.item];
-                        temp.splice(destination.index, 0, allData[removeIdx].item[source.index]);
-                        const res = {
-                            id: data.id,
-                            name: data.name,
-                            item: [...temp],
-                        };
-                        return res;
-                    }
-                    return data;
-                });
-
-                return copy;
-            });
-        } else {
-            setToDo((data) => {
-                const copy = [...data];
-                copy.splice(source.index, 1);
-                const temp = data.filter((data) => data.name === source.droppableId);
-                copy.splice(destination!.index, 0, temp[0]);
-                return copy;
+const App = () => {
+    const DragEnd = ({ type, destination, source }: DropResult) => {
+        if (type === "parent") {
+            setToDo((res) => {
+                console.log(res, "res");
+                const copy = { ...res };
+                console.log(copy, "copy");
+                return res;
             });
         }
     };
-    const addBoard = (data: any) => {
-        if (value.length <= 0) return;
-        const str = value;
-        const res = [
-            ...toDo,
-            {
-                id: Date.now(),
-                name: value,
-                item: [],
-            },
-        ];
-        newBoard(res);
-        setValue("");
-    };
-    const onChange = (event: React.FormEvent<HTMLInputElement>) => {
-        setValue(event.currentTarget.value);
-    };
+    const [toDo, setToDo] = useRecoilState<ITest>(testToDo);
 
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <DeleteToDo>
-                <Droppable droppableId="0">
-                    {(magic) => (
-                        <div ref={magic.innerRef}>
-                            <Draggable draggableId="0" index={0}>
-                                {(hole) => (
-                                    <>
-                                        <AddBoard>
-                                            <div>ADD BOARD</div>
-                                            <div>
-                                                <input type="text" onChange={onChange} value={value}></input>
-                                                <span onClick={addBoard}>✖️</span>
-                                            </div>
-                                        </AddBoard>
-                                        <div ref={hole.innerRef} {...hole.dragHandleProps}>
-                                            🗑️
-                                        </div>
-                                    </>
-                                )}
-                            </Draggable>
-                            {/* {magic.placeholder} */}
-                        </div>
+        <>
+            <DragDropContext onDragEnd={DragEnd}>
+                <Droppable droppableId="droppable" type={"parent"}>
+                    {(dropProvider) => (
+                        <>
+                            <DropableArea ref={dropProvider.innerRef} {...dropProvider.droppableProps}>
+                                {Object.keys(toDo).map((item, index) => {
+                                    return (
+                                        <>
+                                            <Draggable
+                                                key={toDo[item][0].id}
+                                                draggableId={toDo[item][0].name}
+                                                index={index}
+                                            >
+                                                {(dragProvider) => (
+                                                    <>
+                                                        <DragableArea
+                                                            ref={dragProvider.innerRef}
+                                                            {...dragProvider.draggableProps}
+                                                        >
+                                                            {toDo[item][0].name}
+                                                            <span
+                                                                style={{
+                                                                    border: "1px solid blue",
+                                                                }}
+                                                                {...dragProvider.dragHandleProps}
+                                                            >
+                                                                MOVE
+                                                            </span>
+                                                            <Droppable
+                                                                droppableId={toDo[item][0].id + ""}
+                                                                type={"children"}
+                                                            >
+                                                                {(childPro) => (
+                                                                    <>
+                                                                        <SubDropableArea ref={childPro.innerRef}>
+                                                                            {toDo[item][0].item.map(
+                                                                                (subItem, index) => (
+                                                                                    <>
+                                                                                        <>
+                                                                                            <Draggable
+                                                                                                key={subItem.id}
+                                                                                                draggableId={
+                                                                                                    subItem.id + ""
+                                                                                                }
+                                                                                                index={index}
+                                                                                            >
+                                                                                                {(provider) => (
+                                                                                                    <>
+                                                                                                        <SubDraggableArea
+                                                                                                            ref={
+                                                                                                                provider.innerRef
+                                                                                                            }
+                                                                                                            {...provider.dragHandleProps}
+                                                                                                            {...provider.draggableProps}
+                                                                                                        >
+                                                                                                            {
+                                                                                                                subItem.text
+                                                                                                            }
+                                                                                                        </SubDraggableArea>
+                                                                                                    </>
+                                                                                                )}
+                                                                                            </Draggable>
+                                                                                        </>
+                                                                                    </>
+                                                                                )
+                                                                            )}
+                                                                        </SubDropableArea>
+                                                                        {childPro.placeholder}
+                                                                    </>
+                                                                )}
+                                                            </Droppable>
+                                                        </DragableArea>
+                                                    </>
+                                                )}
+                                            </Draggable>
+                                        </>
+                                    );
+                                })}
+                            </DropableArea>
+                            {dropProvider.placeholder}
+                        </>
                     )}
                 </Droppable>
-            </DeleteToDo>
-            <Wrapper>
-                <Boards>
-                    {toDo.map((data, index) => (
-                        // toDos = [ { id, text}] 를 주는중.
-                        <Board key={data.name} id={data.id} index={index} toDos={data.item!} boardId={data.name} />
-                    ))}
-                </Boards>
-            </Wrapper>
-        </DragDropContext>
+            </DragDropContext>
+        </>
     );
-}
+};
 
 export default App;

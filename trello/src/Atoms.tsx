@@ -20,6 +20,83 @@ export interface IToDoState {
     // };
 }
 
+export interface IT {
+    id: number;
+    text: string;
+}
+
+export interface ITe {
+    id: number;
+    name: string;
+    item: IT[];
+}
+
+export interface ITest {
+    [key: string]: ITe[];
+}
+
+export const testToDo = atom<ITest>({
+    key: "test",
+    default: {
+        "TO DO": [
+            {
+                id: 1,
+                name: "TO DO",
+                item: [
+                    {
+                        id: 11,
+                        text: "안녕",
+                    },
+                    {
+                        id: 12,
+                        text: "안녕",
+                    },
+                    {
+                        id: 13,
+                        text: "안녕",
+                    },
+                    {
+                        id: 14,
+                        text: "안녕",
+                    },
+                    {
+                        id: 15,
+                        text: "안녕",
+                    },
+                ],
+            },
+        ],
+        DONE: [
+            {
+                id: 2,
+                name: "DONE",
+                item: [
+                    {
+                        id: 21,
+                        text: "하세요",
+                    },
+                    {
+                        id: 22,
+                        text: "하세요",
+                    },
+                    {
+                        id: 23,
+                        text: "하세요",
+                    },
+                    {
+                        id: 24,
+                        text: "하세요",
+                    },
+                    {
+                        id: 25,
+                        text: "하세요",
+                    },
+                ],
+            },
+        ],
+    },
+});
+
 export const toDoState = atom<IToDoState[]>({
     key: "toDo",
     default: [
