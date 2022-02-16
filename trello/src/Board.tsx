@@ -96,34 +96,54 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
     const [toDo, setTodo] = useRecoilState(toDoState);
     const changeToDo = useSetRecoilState(toDoChange);
     const onValue = (data: IUseForm) => {
-        console.log(data[boardId], "?");
-        const time = Date.now();
-        const newToDo = {
-            id: time,
-            name: boardId,
-            item: [
-                {
-                    id: time + 1,
-                    text: data[boardId],
-                },
-            ],
-        };
+        const test = [
+            {
+                id: 1,
+                str: "a",
+                item: [
+                    {
+                        id: 1,
+                        tem: "aa",
+                    },
+                ],
+            },
+            {
+                id: 2,
+                str: "b",
+                item: [
+                    {
+                        id: 2,
+                        tem: "bb",
+                    },
+                ],
+            },
+            {
+                id: 3,
+                str: "d",
+                item: [
+                    {
+                        id: 3,
+                        tem: "cc",
+                    },
+                ],
+            },
+        ];
+        console.log(test, "dd???????");
+
         setTodo((toDo) => {
             const copy = toDo.map((toDo) => {
+                // console.log(toDo, "map");
                 if (toDo.name === boardId) {
-                    const res = toDo.item;
-                    res.unshift([
-                        {
-                            id: Date.now(),
-                            text: data[boardId],
-                        },
-                    ]);
+                    let res = { ...toDo };
+                    res.item.unshift({
+                        id: Date.now(),
+                        text: data[boardId],
+                    });
                     return res;
                 }
                 return toDo;
             });
 
-            console.log(toDo, copy);
             return toDo;
         });
         setValue(boardId, "");

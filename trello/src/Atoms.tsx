@@ -6,8 +6,8 @@ export const minutesState = atom({
 });
 
 export interface IToDo {
-    id?: number;
-    text?: string;
+    id: number;
+    text: string;
 }
 
 export interface IToDoState {
