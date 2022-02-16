@@ -5,7 +5,6 @@ import DragabbleCard from "./Draggable";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { IToDo, toDoState, toDoChange } from "./Atoms";
 import { useRef } from "react";
-import { saveData } from "./App";
 
 interface IDropable {
     isDraggingOver: boolean;

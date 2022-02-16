@@ -49,19 +49,19 @@ export const testToDo = atom<ITest>({
                     },
                     {
                         id: 12,
-                        text: "안녕",
+                        text: "하세요",
                     },
                     {
                         id: 13,
-                        text: "안녕",
+                        text: "반갑",
                     },
                     {
                         id: 14,
-                        text: "안녕",
+                        text: "습니다",
                     },
                     {
                         id: 15,
-                        text: "안녕",
+                        text: "!!",
                     },
                 ],
             },
@@ -73,23 +73,23 @@ export const testToDo = atom<ITest>({
                 item: [
                     {
                         id: 21,
-                        text: "하세요",
+                        text: "1",
                     },
                     {
                         id: 22,
-                        text: "하세요",
+                        text: "2",
                     },
                     {
                         id: 23,
-                        text: "하세요",
+                        text: "3",
                     },
                     {
                         id: 24,
-                        text: "하세요",
+                        text: "4",
                     },
                     {
                         id: 25,
-                        text: "하세요",
+                        text: "5",
                     },
                 ],
             },
