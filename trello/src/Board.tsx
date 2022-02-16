@@ -96,7 +96,7 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
     const [toDo, setTodo] = useRecoilState(toDoState);
     const changeToDo = useSetRecoilState(toDoChange);
     const onValue = (data: IUseForm) => {
-        console.log(data[boardId]);
+        console.log(data[boardId], "?");
         const time = Date.now();
         const newToDo = {
             id: time,
@@ -109,36 +109,22 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
             ],
         };
         setTodo((toDo) => {
-            console.log(toDo);
-            let idx: number;
-            for (let i = 0; i < toDo.length; i++) {
-                if (toDo[i].name === boardId) {
-                    idx = i;
+            const copy = toDo.map((toDo) => {
+                if (toDo.name === boardId) {
+                    const res = toDo.item;
+                    res.unshift([
+                        {
+                            id: Date.now(),
+                            text: data[boardId],
+                        },
+                    ]);
+                    return res;
                 }
-            }
-            const copy = toDo.filter((data) => data.name !== boardId);
-            const temp = toDo.filter((data) => data.name === boardId);
-            const test = [...temp[0].item];
-            test.unshift({
-                id: time + 1,
-                text: data[boardId],
+                return toDo;
             });
-            const newToDo = {
-                id: id,
-                name: boardId,
-                item: test,
-            };
-            //     {
-            //     id: 3,
-            //     name: "DONE",
-            //     item: [
-            //         {
-            //             id: 2,
-            //             text: "hi",
-            //         },
-            //     ],
-            // },
-            return [...toDo];
+
+            console.log(toDo, copy);
+            return toDo;
         });
         setValue(boardId, "");
     };

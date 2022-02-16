@@ -24,12 +24,12 @@ export const toDoState = atom<IToDoState[]>({
     key: "toDo",
     default: [
         {
-            id: 1,
+            id: 0,
             name: "TO DO",
             item: [],
         },
         {
-            id: 2,
+            id: 1,
             name: "DOING",
             item: [
                 {
@@ -51,7 +51,7 @@ export const toDoState = atom<IToDoState[]>({
             ],
         },
         {
-            id: 3,
+            id: 2,
             name: "DONE",
             item: [
                 {
