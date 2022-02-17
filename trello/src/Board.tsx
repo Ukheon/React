@@ -2,18 +2,29 @@ import { Droppable, Id, Draggable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import DragabbleCard from "./Draggable";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { IToDo, toDoState, toDoChange, IToDoState } from "./Atoms";
-import { useRef } from "react";
-import { saveData } from "./App";
-import { isPropertySignature } from "typescript";
+import { useRecoilState } from "recoil";
+import { IToDo, toDoState } from "./Atoms";
+import { saveData } from "./utils";
+import { findIdx } from "./utils";
 
 interface IDropable {
     isDraggingOver: boolean;
     draggingFromThisWith: boolean;
 }
 
+interface IBoardProps {
+    toDos: IToDo[];
+    boardId: string;
+    index: number;
+    id: number;
+}
+
+interface IUseForm {
+    [toDo: string]: string;
+}
+
 const Wrapper = styled.div<IDropable>`
+    z-index: 10;
     padding: 5px 10px;
     margin-top: 20px;
     background-color: ${(props) =>
@@ -26,13 +37,6 @@ const Wrapper = styled.div<IDropable>`
     transition: background-color 0.3s ease-in;
 `;
 
-interface IBoardProps {
-    toDos: IToDo[];
-    boardId: string;
-    index: number;
-    id: number;
-}
-
 const Form = styled.form`
     width: 100%;
     display: flex;
@@ -41,7 +45,6 @@ const Form = styled.form`
         color: ${(props) => props.theme.textColor};
         margin-top: 10px;
         width: 100%;
-        /* height: 30px; */
         font-size: 16px;
         background-color: transparent;
         border: none;
@@ -59,18 +62,6 @@ const Form = styled.form`
     }
 `;
 
-const DeleteBoard = styled.span<{ flag: boolean }>`
-    display: ${(props) => (props.flag ? "none" : "inline-block")};
-    /* display: none; */
-    position: absolute;
-    top: -20px;
-    right: 10px;
-    z-index: 10;
-    width: 20px;
-    height: 20px;
-    font-size: 30px;
-`;
-
 const MoveAble = styled.div<{ flag: boolean }>`
     width: 100%;
     height: 100%;
@@ -84,48 +75,9 @@ const MoveAble = styled.div<{ flag: boolean }>`
     background-color: ${(props) => props.theme.bdColor};
 `;
 
-interface IUseForm {
-    [toDo: string]: string;
-}
-
-export const findIdx = (toDo: IToDoState[], name: string) => {
-    let idx: number = 0;
-    for (let i = 0; i < toDo.length; i++) {
-        if (toDo[i].name === name) {
-            idx = i;
-            break;
-        }
-    }
-    return idx;
-};
-
-const DeleteToDo = styled.div`
-    width: 550px;
-    margin: 20px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 30px;
-
-    div:first-child {
-        align-items: center;
-        text-align: center;
-    }
-`;
-
-const DeleteSpace = styled.div`
-    position: fixed;
-    width: 100px;
-    height: 100px;
-    background-color: red;
-    top: 80px;
-    left: 10px;
-`;
-
 function Board({ toDos, boardId, index, id }: IBoardProps) {
     const { register, setValue, handleSubmit } = useForm<IUseForm>();
     const [toDo, setTodo] = useRecoilState(toDoState);
-    const changeToDo = useSetRecoilState(toDoChange);
     const onValue = (data: IUseForm) => {
         let idx: number = findIdx(toDo, boardId);
         setTodo((toDo) => {
@@ -142,72 +94,79 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
             };
             copy.splice(idx, 1);
             copy.splice(idx, 0, copytest);
+            saveData(copy);
             return copy;
         });
         setValue(boardId, "");
     };
-    const deleteBoard = () => {
-        // const copyToDo = { ...toDo };
-        // delete copyToDo[boardId];
-        // saveData(copyToDo);
-        // changeToDo(copyToDo);
-    };
-
     return (
-        <>
-            <Droppable droppableId={boardId} type="parentBoard">
-                {(provider, snapshot) => (
-                    <Check ref={provider.innerRef}>
-                        <Draggable key={boardId} draggableId={boardId} index={index}>
-                            {(provider, snapshot) => (
-                                <>
-                                    <MoveAble
-                                        flag={snapshot.isDragging}
-                                        ref={provider.innerRef}
-                                        {...provider.draggableProps}
-                                    >
-                                        <div {...provider.dragHandleProps}>{boardId}</div>
-                                        <Form onSubmit={handleSubmit(onValue)}>
-                                            <input
-                                                type="text"
-                                                placeholder={"Add Task"}
-                                                {...register(boardId, { required: "hi" })}
-                                            ></input>
-                                            {/* <button>Enter</button> */}
-                                        </Form>
-                                        <Droppable droppableId={boardId}>
-                                            {(magic, snapshot) => (
-                                                <Wrapper
-                                                    isDraggingOver={snapshot.isDraggingOver}
-                                                    draggingFromThisWith={Boolean(snapshot.draggingFromThisWith)}
-                                                    ref={magic.innerRef}
-                                                    {...magic.droppableProps}
-                                                >
-                                                    {toDos.map((toDo, index) => (
-                                                        <DragabbleCard
-                                                            key={toDo.id!}
-                                                            boardId={toDo.id!}
-                                                            index={index}
-                                                            toDo={toDo.text!}
-                                                        />
-                                                    ))}
-                                                </Wrapper>
-                                            )}
-                                        </Droppable>
-                                    </MoveAble>
-                                </>
-                            )}
-                        </Draggable>
+        <Main>
+            <Droppable droppableId={boardId} type="parent">
+                {(provider) => (
+                    <>
+                        <Check ref={provider.innerRef} {...provider.droppableProps}>
+                            <Draggable key={boardId} draggableId={boardId} index={index}>
+                                {(provider, snapshot) => (
+                                    <>
+                                        <MoveAble
+                                            flag={snapshot.isDragging}
+                                            ref={provider.innerRef}
+                                            {...provider.draggableProps}
+                                        >
+                                            <div {...provider.dragHandleProps}>{boardId}</div>
+                                            <Form onSubmit={handleSubmit(onValue)}>
+                                                <input
+                                                    type="text"
+                                                    placeholder={"Add Task"}
+                                                    {...register(boardId, { required: "hi" })}
+                                                ></input>
+                                            </Form>
+                                            <Droppable droppableId={boardId} type="children">
+                                                {(magic, snapshot) => (
+                                                    <>
+                                                        <Wrapper
+                                                            isDraggingOver={snapshot.isDraggingOver}
+                                                            draggingFromThisWith={Boolean(
+                                                                snapshot.draggingFromThisWith
+                                                            )}
+                                                            ref={magic.innerRef}
+                                                            {...magic.droppableProps}
+                                                        >
+                                                            {toDos.map((toDo, index) => (
+                                                                <DragabbleCard
+                                                                    key={toDo.id!}
+                                                                    boardId={toDo.id!}
+                                                                    index={index}
+                                                                    toDo={toDo.text!}
+                                                                />
+                                                            ))}
+                                                            {magic.placeholder}
+                                                        </Wrapper>
+                                                    </>
+                                                )}
+                                            </Droppable>
+                                        </MoveAble>
+                                    </>
+                                )}
+                            </Draggable>
+                        </Check>
                         {provider.placeholder}
-                    </Check>
+                    </>
                 )}
             </Droppable>
-        </>
+        </Main>
     );
 }
 
+const Main = styled.div`
+    width: 230px;
+`;
+
 const Check = styled.div`
-    /* background-color: red; */
+    width: 100%;
+    /* z-index: ; */
+    max-width: 230px;
+    background-color: red;
 `;
 
 export default Board;

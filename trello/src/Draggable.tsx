@@ -1,10 +1,7 @@
-import { Draggable, Droppable } from "react-beautiful-dnd";
-
+import { Draggable } from "react-beautiful-dnd";
 import React from "react";
 import styled from "styled-components";
-import { useSetRecoilState } from "recoil";
-import { toDoState } from "./Atoms";
-import { reduceEachLeadingCommentRange } from "typescript";
+
 interface IDraggableCard {
     toDo: string;
     index: number;
@@ -31,14 +28,16 @@ const DraggableCard = ({ boardId, toDo, index }: IDraggableCard) => {
         <>
             <Draggable draggableId={boardId + ""} index={index}>
                 {(magic, snapshot) => (
-                    <Card
-                        isDraggingOver={snapshot.isDragging}
-                        ref={magic.innerRef}
-                        {...magic.dragHandleProps}
-                        {...magic.draggableProps}
-                    >
-                        <div>{toDo}</div>
-                    </Card>
+                    <>
+                        <Card
+                            isDraggingOver={snapshot.isDragging}
+                            ref={magic.innerRef}
+                            {...magic.dragHandleProps}
+                            {...magic.draggableProps}
+                        >
+                            <div>{toDo}</div>
+                        </Card>
+                    </>
                 )}
             </Draggable>
         </>
