@@ -6,23 +6,7 @@ import styled from "styled-components";
 import DraggableCard from "./Draggable";
 import DraggableBoard from "./Board";
 import Board from "./Board";
-
-const Wrapper = styled.div`
-    display: flex;
-    max-width: 600px;
-    width: 100%;
-    margin: 0 auto;
-    justify-content: center;
-    align-items: center;
-    /* height: 100vh; */
-`;
-
-const Boards = styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 3fr);
-    width: 100%;
-    gap: 10px;
-`;
+import { findIdx } from "./Board";
 
 export const saveData = (toDo: IToDoState) => {
     localStorage.setItem("data", JSON.stringify(toDo));
@@ -31,26 +15,44 @@ export const saveData = (toDo: IToDoState) => {
 export const getData = () => {
     return JSON.parse(localStorage.getItem("data") as any);
 };
+const Wrapper = styled.div`
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+`;
+
+const Boards = styled.div`
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    width: 100%;
+    gap: 10px;
+`;
 
 const AddBoard = styled.div`
+    margin-top: 30px;
     > div:last-child {
         display: flex;
         justify-content: center;
         align-items: center;
         > input {
+            color: white;
             height: 20px;
             border: none;
             background-color: transparent;
-            /* opacity: 0.7; */
+
             border-bottom: 3px solid white;
             border-radius: 3px;
             &:focus {
                 outline: none;
-                /* border: none; */
+                border-color: ${(props) => props.theme.accentColor};
             }
         }
         > span {
-            /* height: 20px; */
             font-size: 20px;
         }
         margin-top: 5px;
@@ -60,42 +62,21 @@ const AddBoard = styled.div`
 
 const DeleteToDo = styled.div`
     width: 550px;
-    /* max-width: 530px; */
     margin: 20px auto;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 30px;
-    /* height: 10px; */
+
     div:first-child {
         align-items: center;
         text-align: center;
     }
 `;
 
-const DropableArea = styled.div`
-    width: 600px;
-    height: 500px;
-    margin: 0 auto;
-    background-color: white;
-    display: flex;
-    justify-content: space-between;
-`;
-
-const SubDropableArea = styled.div`
+const DeleteSpace = styled.div`
     width: 100%;
-    height: 400px;
-    color: red;
-`;
-
-const DragableArea = styled.div`
-    width: 45%;
-    height: 400px;
-    gap: 10px;
-    background-color: gray;
-`;
-const SubDraggableArea = styled.div`
-    background-color: blue;
+    height: 100px;
 `;
 
 function App() {
@@ -111,49 +92,55 @@ function App() {
     }, []);
 
     const onDragEnd = ({ type, destination, source }: DropResult) => {
-        // console.log(destination, source, type);
-        console.log(destination, "목적지");
-        console.log(source, "이벤트 발생지점");
-        // console.log(event);
+        console.log(destination, source);
         if (!destination) return;
         if (type === "DEFAULT") {
-            setToDo((allData) => {
-                let removeIdx: number;
-                for (let i: number = 0; i < allData.length; i++) {
-                    if (allData[i].name === source.droppableId) removeIdx = i;
-                }
-                const copy = allData.map((data, index) => {
-                    console.log("data", data);
-                    // 지울꺼임
-                    if (data.name === source.droppableId) {
-                        const temp = [...data.item];
-
-                        temp.splice(source.index, 1);
-                        const res = {
-                            id: data.id,
-                            name: data.name,
-                            item: [...temp],
-                        };
-                        console.log(data, "data");
-                        console.log(res, "res");
-                        return res;
-                    }
-                    // 넣을곳
-                    if (data.name === destination.droppableId) {
-                        const temp = [...data.item];
-                        temp.splice(destination.index, 0, allData[removeIdx].item[source.index]);
-                        const res = {
-                            id: data.id,
-                            name: data.name,
-                            item: [...temp],
-                        };
-                        return res;
-                    }
-                    return data;
+            if (destination.droppableId === source.droppableId) {
+                setToDo((allData) => {
+                    let idx: number = findIdx(allData, destination.droppableId);
+                    const copy = [...allData];
+                    const item = [...allData[idx].item];
+                    const temp = { ...item[source.index] };
+                    item.splice(source.index, 1);
+                    item.splice(destination.index, 0, temp);
+                    const copyTodo = {
+                        id: copy[idx].id,
+                        name: copy[idx].name,
+                        item: item,
+                    };
+                    copy.splice(idx, 1);
+                    copy.splice(idx, 0, copyTodo);
+                    return [...copy];
                 });
-
-                return copy;
-            });
+            } else {
+                setToDo((allData) => {
+                    let removeIdx: number = findIdx(allData, source.droppableId);
+                    const copy = allData.map((data, index) => {
+                        if (data.name === source.droppableId) {
+                            const temp = [...data.item];
+                            temp.splice(source.index, 1);
+                            const res = {
+                                id: data.id,
+                                name: data.name,
+                                item: [...temp],
+                            };
+                            return res;
+                        }
+                        if (data.name === destination.droppableId) {
+                            const temp = [...data.item];
+                            temp.splice(destination.index, 0, allData[removeIdx].item[source.index]);
+                            const res = {
+                                id: data.id,
+                                name: data.name,
+                                item: [...temp],
+                            };
+                            return res;
+                        }
+                        return data;
+                    });
+                    return copy;
+                });
+            }
         } else {
             setToDo((data) => {
                 const copy = [...data];
@@ -166,11 +153,17 @@ function App() {
     };
     const addBoard = (data: any) => {
         if (value.length <= 0) return;
-        const str = value;
+        if (
+            toDo.findIndex((data) => {
+                return data.name === value;
+            }) >= 0
+        ) {
+            return;
+        }
         const res = [
             ...toDo,
             {
-                id: Date.now(),
+                id: toDo.length,
                 name: value,
                 item: [],
             },
@@ -181,44 +174,46 @@ function App() {
     const onChange = (event: React.FormEvent<HTMLInputElement>) => {
         setValue(event.currentTarget.value);
     };
-
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <DeleteToDo>
-                <Droppable droppableId="0">
-                    {(magic) => (
-                        <div ref={magic.innerRef}>
-                            <Draggable draggableId="0" index={0}>
-                                {(hole) => (
-                                    <>
-                                        <AddBoard>
-                                            <div>ADD BOARD</div>
-                                            <div>
-                                                <input type="text" onChange={onChange} value={value}></input>
-                                                <span onClick={addBoard}>✖️</span>
+        <>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <AddBoard>
+                    <div>
+                        <input type="text" placeholder="ADD BOARD" onChange={onChange} value={value}></input>
+                        <span onClick={addBoard}>✖️</span>
+                    </div>
+                </AddBoard>
+                <DeleteToDo>
+                    <Droppable droppableId="0" type="delete">
+                        {(magic) => (
+                            <DeleteSpace ref={magic.innerRef} {...magic.droppableProps}>
+                                안니용
+                                <Draggable draggableId="0" index={0}>
+                                    {(hole) => (
+                                        <>
+                                            <div ref={hole.innerRef} {...hole.dragHandleProps}>
+                                                🗑️
                                             </div>
-                                        </AddBoard>
-                                        <div ref={hole.innerRef} {...hole.dragHandleProps}>
-                                            🗑️
-                                        </div>
-                                    </>
-                                )}
-                            </Draggable>
-                            {/* {magic.placeholder} */}
-                        </div>
-                    )}
-                </Droppable>
-            </DeleteToDo>
-            <Wrapper>
-                <Boards>
-                    {toDo.map((data, index) => (
-                        // toDos = [ { id, text}] 를 주는중.
-                        <Board key={data.name} id={data.id} index={index} toDos={data.item} boardId={data.name} />
-                    ))}
-                </Boards>
-            </Wrapper>
-        </DragDropContext>
+                                        </>
+                                    )}
+                                </Draggable>
+                                {/* <div>🗑️</div> */}
+                                {magic.placeholder}
+                            </DeleteSpace>
+                        )}
+                    </Droppable>
+                </DeleteToDo>
+                <Wrapper>
+                    <Boards>
+                        {toDo.map((data, index) => (
+                            <Board key={data.name} id={data.id} index={index} toDos={data.item} boardId={data.name} />
+                        ))}
+                    </Boards>
+                </Wrapper>
+            </DragDropContext>
+        </>
     );
 }
 
+const Main = styled.div``;
 export default App;

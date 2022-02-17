@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import DragabbleCard from "./Draggable";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { IToDo, toDoState, toDoChange } from "./Atoms";
+import { IToDo, toDoState, toDoChange, IToDoState } from "./Atoms";
 import { useRef } from "react";
 import { saveData } from "./App";
+import { isPropertySignature } from "typescript";
 
 interface IDropable {
     isDraggingOver: boolean;
@@ -15,7 +16,6 @@ interface IDropable {
 const Wrapper = styled.div<IDropable>`
     padding: 5px 10px;
     margin-top: 20px;
-
     background-color: ${(props) =>
         props.isDraggingOver ? "pink" : props.draggingFromThisWith ? "#caccd0" : props.theme.bdColor};
     cursor: ${(props) => (props.isDraggingOver ? "grab" : "pointer")};
@@ -24,23 +24,6 @@ const Wrapper = styled.div<IDropable>`
     justify-content: center;
     flex-grow: 1;
     transition: background-color 0.3s ease-in;
-`;
-
-const Main = styled.div`
-    width: 100%;
-    background-color: ${(props) => props.theme.bdColor};
-    > div:first-child {
-        width: 100%;
-        text-align: center;
-        font-weight: bold;
-        padding: 10px 0;
-        border-bottom: 3px outset gray;
-        border-image: linear-gradient(to right, #8b8bec, #8acef0);
-        border-image-slice: 1;
-    }
-    display: flex;
-    flex-direction: column;
-    position: relative;
 `;
 
 interface IBoardProps {
@@ -55,11 +38,19 @@ const Form = styled.form`
     display: flex;
     position: relative;
     > input {
+        color: ${(props) => props.theme.textColor};
+        margin-top: 10px;
         width: 100%;
+        /* height: 30px; */
+        font-size: 16px;
         background-color: transparent;
-        border-bottom: 1px grid red;
-        border-color: white;
-        background-color: white;
+        border: none;
+        border-bottom: 3px solid black;
+        border-radius: 5px;
+        &:focus {
+            outline: none;
+            border-color: ${(props) => props.theme.accentColor};
+        }
     }
     > div {
         position: absolute;
@@ -80,10 +71,16 @@ const DeleteBoard = styled.span<{ flag: boolean }>`
     font-size: 30px;
 `;
 
-const MoveAble = styled.div`
+const MoveAble = styled.div<{ flag: boolean }>`
     width: 100%;
-    /* height: 100%; */
-    color: red;
+    height: 100%;
+    > div:first-child {
+        text-align: center;
+        font-size: 24px;
+        border-bottom: 1px solid ${(props) => props.theme.bgColor};
+        background-color: ${(props) => (props.flag ? props.theme.accentColor : "transparents")};
+        margin-bottom: 10px;
+    }
     background-color: ${(props) => props.theme.bdColor};
 `;
 
@@ -91,60 +88,38 @@ interface IUseForm {
     [toDo: string]: string;
 }
 
+export const findIdx = (toDo: IToDoState[], name: string) => {
+    let idx: number = 0;
+    for (let i = 0; i < toDo.length; i++) {
+        if (toDo[i].name === name) {
+            idx = i;
+            break;
+        }
+    }
+    return idx;
+};
+
 function Board({ toDos, boardId, index, id }: IBoardProps) {
     const { register, setValue, handleSubmit } = useForm<IUseForm>();
     const [toDo, setTodo] = useRecoilState(toDoState);
     const changeToDo = useSetRecoilState(toDoChange);
     const onValue = (data: IUseForm) => {
-        const test = [
-            {
-                id: 1,
-                str: "a",
-                item: [
-                    {
-                        id: 1,
-                        tem: "aa",
-                    },
-                ],
-            },
-            {
-                id: 2,
-                str: "b",
-                item: [
-                    {
-                        id: 2,
-                        tem: "bb",
-                    },
-                ],
-            },
-            {
-                id: 3,
-                str: "d",
-                item: [
-                    {
-                        id: 3,
-                        tem: "cc",
-                    },
-                ],
-            },
-        ];
-        console.log(test, "dd???????");
-
+        let idx: number = findIdx(toDo, boardId);
         setTodo((toDo) => {
-            const copy = toDo.map((toDo) => {
-                // console.log(toDo, "map");
-                if (toDo.name === boardId) {
-                    let res = { ...toDo };
-                    res.item.unshift({
-                        id: Date.now(),
-                        text: data[boardId],
-                    });
-                    return res;
-                }
-                return toDo;
+            let copy = [...toDo];
+            const temp = [...toDo[idx].item];
+            temp.unshift({
+                id: Date.now(),
+                text: data[boardId],
             });
-
-            return toDo;
+            const copytest = {
+                id: toDo[idx].id,
+                name: toDo[idx].name,
+                item: temp,
+            };
+            copy.splice(idx, 1);
+            copy.splice(idx, 0, copytest);
+            return copy;
         });
         setValue(boardId, "");
     };
@@ -157,25 +132,24 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
 
     return (
         <>
-            {/* <Main> */}
-            <Droppable droppableId={boardId} direction="horizontal" type="parentBoard">
-                {(provider) => (
-                    <div ref={provider.innerRef}>
+            <Droppable droppableId={boardId} type="parentBoard">
+                {(provider, snapshot) => (
+                    <Check ref={provider.innerRef}>
                         <Draggable key={boardId} draggableId={boardId} index={index}>
-                            {(provider) => (
+                            {(provider, snapshot) => (
                                 <MoveAble
+                                    flag={snapshot.isDragging}
                                     ref={provider.innerRef}
-                                    {...provider.dragHandleProps}
                                     {...provider.draggableProps}
                                 >
-                                    <div>{boardId}</div>
+                                    <div {...provider.dragHandleProps}>{boardId}</div>
                                     <Form onSubmit={handleSubmit(onValue)}>
                                         <input
                                             type="text"
-                                            placeholder={"input your schedule"}
+                                            placeholder={"Add Task"}
                                             {...register(boardId, { required: "hi" })}
                                         ></input>
-                                        <button>Enter</button>
+                                        {/* <button>Enter</button> */}
                                     </Form>
                                     <Droppable droppableId={boardId}>
                                         {(magic, snapshot) => (
@@ -185,104 +159,30 @@ function Board({ toDos, boardId, index, id }: IBoardProps) {
                                                 ref={magic.innerRef}
                                                 {...magic.droppableProps}
                                             >
-                                                {toDos.length > 0
-                                                    ? toDos.map((toDo, index) => (
-                                                          <DragabbleCard
-                                                              key={toDo.id!}
-                                                              boardId={toDo.id!}
-                                                              index={index}
-                                                              toDo={toDo.text!}
-                                                          />
-                                                      ))
-                                                    : ""}
-                                                {magic.placeholder}
+                                                {toDos.map((toDo, index) => (
+                                                    <DragabbleCard
+                                                        key={toDo.id!}
+                                                        boardId={toDo.id!}
+                                                        index={index}
+                                                        toDo={toDo.text!}
+                                                    />
+                                                ))}
                                             </Wrapper>
                                         )}
                                     </Droppable>
                                 </MoveAble>
                             )}
                         </Draggable>
-                    </div>
+                        {provider.placeholder}
+                    </Check>
                 )}
             </Droppable>
-            {/* <div>{boardId}</div>
-                <Form onSubmit={handleSubmit(onValue)}>
-                    <input
-                        type="text"
-                        placeholder={"input your schedule"}
-                        {...register(boardId, { required: "hi" })}
-                    ></input>
-                    <button>Enter</button>
-                </Form>
-                <Droppable droppableId={boardId}>
-                    {(magic, snapshot) => (
-                        <Wrapper
-                            isDraggingOver={snapshot.isDraggingOver}
-                            draggingFromThisWith={Boolean(snapshot.draggingFromThisWith)}
-                            ref={magic.innerRef}
-                            {...magic.droppableProps}
-                        >
-                            {toDos.map((toDo, index) => (
-                                <DragabbleCard key={toDo.id} boardId={toDo.id} index={index} toDo={toDo.text} />
-                            ))}
-                            {magic.placeholder}
-                        </Wrapper>
-                    )}
-                </Droppable> */}
-            {/* </Main> */}
-            {/* <Droppable droppableId={boardId}>
-                {(magic, snapshot) => (
-                    <> */}
-            {/* <MoveAble {...magic.droppableProps} ref={magic.innerRef}>
-                                <Draggable draggableId={boardId} index={index}>
-                                    {(dragProvider) => (
-                                        <>
-                                            <div ref={dragProvider.innerRef} {...dragProvider.draggableProps}>
-                                                {boardId}
-                                            </div>
-                                            <DeleteBoard
-                                                onClick={deleteBoard}
-                                                flag={boardId === "TO DO" || boardId === "DONE" || boardId === "DOING"}
-                                            >
-                                                🔥
-                                            </DeleteBoard>
-                                            <Form onSubmit={handleSubmit(onValue)}>
-                                                <input
-                                                    type="text"
-                                                    placeholder={"input your schedule"}
-                                                    {...register(boardId, { required: "hi" })}
-                                                ></input>
-                                                <div onClick={handleSubmit(onValue)}>✖️</div>
-                                                <button>Enter</button>
-                                            </Form>
-                                            <Droppable droppableId={boardId + index}>
-                                                {(dropProvider, snapshot) => (
-                                                    <Wrapper
-                                                        isDraggingOver={snapshot.isDraggingOver}
-                                                        draggingFromThisWith={Boolean(snapshot.draggingFromThisWith)}
-                                                        ref={dropProvider.innerRef}
-                                                        {...dropProvider.droppableProps}
-                                                    >
-                                                        {toDos.map((toDo, index) => (
-                                                            <DragabbleCard
-                                                                key={toDo.id}
-                                                                boardId={toDo.id}
-                                                                index={index}
-                                                                toDo={toDo.text}
-                                                            />
-                                                        ))}
-                                                        {dropProvider.placeholder}
-                                                    </Wrapper>
-                                                )}
-                                            </Droppable>
-                                        </>
-                                    )}
-                                </Draggable>
-                            </MoveAble> */}
-            {/* </>
-                )}
-            </Droppable> */}
         </>
     );
 }
+
+const Check = styled.div`
+    /* background-color: red; */
+`;
+
 export default Board;
