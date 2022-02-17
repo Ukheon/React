@@ -67,7 +67,7 @@ const DeleteToDo = styled.div`
     justify-content: center;
     align-items: center;
     font-size: 30px;
-
+    background-color: ${(props) => props.theme.accentColor};
     div:first-child {
         align-items: center;
         text-align: center;
@@ -92,6 +92,7 @@ function App() {
     }, []);
     const onDragEnd = ({ type, destination, source }: DropResult) => {
         console.log(type, destination, source);
+        if (type === "delete") return;
         if (!destination) return;
         if (type === "DEFAULT") {
             if (destination.droppableId === source.droppableId) {
@@ -182,13 +183,13 @@ function App() {
                         <span onClick={addBoard}>✖️</span>
                     </div>
                 </AddBoard>
-                {/* <DeleteToDo>
-                    <Droppable droppableId="0" type="delete">
+                <DeleteToDo>
+                    <Droppable droppableId="delete" type="delete">
                         {(magic) => (
                             <DeleteSpace ref={magic.innerRef} {...magic.droppableProps}>
-                                <Draggable draggableId="0" index={0}>
+                                <Draggable draggableId="delete" index={0}>
                                     {(hole) => (
-                                        <div ref={hole.innerRef} {...hole.dragHandleProps}>
+                                        <div ref={hole.innerRef} {...hole.draggableProps} {...hole.dragHandleProps}>
                                             🗑️여기다 버려
                                         </div>
                                     )}
@@ -196,24 +197,7 @@ function App() {
                             </DeleteSpace>
                         )}
                     </Droppable>
-                </DeleteToDo> */}
-                <DeleteToDo>
-                    <Droppable droppableId="delete" type={"sssssss"}>
-                        {(magic) => (
-                            <div ref={magic.innerRef} {...magic.droppableProps}>
-                                why?
-                                <Draggable draggableId="delete" index={12512509}>
-                                    {(magic) => (
-                                        <div ref={magic.innerRef} {...magic.draggableProps} {...magic.dragHandleProps}>
-                                            여기다버려
-                                        </div>
-                                    )}
-                                </Draggable>
-                            </div>
-                        )}
-                    </Droppable>
                 </DeleteToDo>
-
                 <Wrapper>
                     <Boards>
                         {toDo.map((data, index) => (
