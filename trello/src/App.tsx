@@ -90,9 +90,8 @@ function App() {
             });
         }
     }, []);
-
     const onDragEnd = ({ type, destination, source }: DropResult) => {
-        console.log(destination, source);
+        console.log(type, destination, source);
         if (!destination) return;
         if (type === "DEFAULT") {
             if (destination.droppableId === source.droppableId) {
@@ -183,7 +182,7 @@ function App() {
                         <span onClick={addBoard}>✖️</span>
                     </div>
                 </AddBoard>
-                <DeleteToDo>
+                {/* <DeleteToDo>
                     <Droppable droppableId="0" type="delete">
                         {(magic) => (
                             <DeleteSpace ref={magic.innerRef} {...magic.droppableProps}>
@@ -194,12 +193,27 @@ function App() {
                                         </div>
                                     )}
                                 </Draggable>
-                                {/* <div>🗑️</div> */}
-                                {/* {magic.placeholder} */}
                             </DeleteSpace>
                         )}
                     </Droppable>
+                </DeleteToDo> */}
+                <DeleteToDo>
+                    <Droppable droppableId="delete" type={"sssssss"}>
+                        {(magic) => (
+                            <div ref={magic.innerRef} {...magic.droppableProps}>
+                                why?
+                                <Draggable draggableId="delete" index={12512509}>
+                                    {(magic) => (
+                                        <div ref={magic.innerRef} {...magic.draggableProps} {...magic.dragHandleProps}>
+                                            여기다버려
+                                        </div>
+                                    )}
+                                </Draggable>
+                            </div>
+                        )}
+                    </Droppable>
                 </DeleteToDo>
+
                 <Wrapper>
                     <Boards>
                         {toDo.map((data, index) => (
