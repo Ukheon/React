@@ -187,18 +187,15 @@ function App() {
                     <Droppable droppableId="0" type="delete">
                         {(magic) => (
                             <DeleteSpace ref={magic.innerRef} {...magic.droppableProps}>
-                                안니용
                                 <Draggable draggableId="0" index={0}>
                                     {(hole) => (
-                                        <>
-                                            <div ref={hole.innerRef} {...hole.dragHandleProps}>
-                                                🗑️
-                                            </div>
-                                        </>
+                                        <div ref={hole.innerRef} {...hole.dragHandleProps}>
+                                            🗑️여기다 버려
+                                        </div>
                                     )}
                                 </Draggable>
                                 {/* <div>🗑️</div> */}
-                                {magic.placeholder}
+                                {/* {magic.placeholder} */}
                             </DeleteSpace>
                         )}
                     </Droppable>
