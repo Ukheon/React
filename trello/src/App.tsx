@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { IToDoState, toDoState } from "./Atoms";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult, Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import DraggableCard from "./Draggable";
 import DraggableBoard from "./Board";
@@ -40,7 +40,9 @@ function App() {
         });
     }, []);
     const onDragEnd = ({ destination, source }: DropResult) => {
+        console.log(destination, source);
         if (!destination) return;
+
         if (destination.droppableId === source.droppableId) {
             setToDo((boards) => {
                 localStorage.setItem("data", JSON.stringify(toDo));
@@ -73,6 +75,19 @@ function App() {
     };
     return (
         <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="delete">
+                {(magic) => (
+                    <div ref={magic.innerRef}>
+                        <Draggable draggableId="delete" index={0}>
+                            {(prov) => (
+                                <div ref={prov.innerRef} {...prov.dragHandleProps}>
+                                    여기다버려
+                                </div>
+                            )}
+                        </Draggable>
+                    </div>
+                )}
+            </Droppable>
             <Wrapper>
                 <Boards>
                     {Object.keys(toDo).map((boardId, index) => (
