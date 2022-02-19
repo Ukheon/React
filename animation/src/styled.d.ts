@@ -8,5 +8,6 @@ declare module "styled-components" {
         Dheight: string;
         D_boxWidth: string;
         D_boxHeight: string;
+        bgGradation: string;
     }
 }

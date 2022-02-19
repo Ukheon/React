@@ -27,3 +27,54 @@ export const circleVariants = {
         y: 0,
     },
 };
+
+export const presenceVariants = {
+    initial: {
+        opacity: 0,
+        scale: 0,
+    },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        rotateZ: 360,
+        transition: {
+            duration: 2,
+            type: "tween",
+        },
+    },
+    leaving: {
+        opacity: 0,
+        scale: 0,
+        y: 100,
+    },
+};
+
+export const slideVariants = {
+    start: (flag: boolean) => ({
+        x: flag ? 300 : -300,
+        scale: 0,
+    }),
+    end: {
+        x: 0,
+        scale: 1,
+        transition: {
+            duration: 0.7,
+        },
+    },
+    exit: (flag: boolean) => ({
+        x: flag ? -300 : 300,
+        scale: 0,
+    }),
+};
+
+export const overlayVariants = {
+    start: {
+        backgroundColor: "rgba(0,0,0,0)",
+    },
+    end: {
+        backgroundColor: "rgba(0,0,0,0.7)",
+    },
+    exit: {
+        backgroundColor: "rgba(0,0,0,0)",
+    },
+};
