@@ -100,10 +100,11 @@ const Nav = styled(motion.nav)`
     justify-content: space-between;
     align-items: center;
     position: fixed;
-    width: 100%;
+    width: 100vw;
     top: 0;
     font-size: ${(props) => props.theme.fontSize.default};
     padding: 20px 60px;
+    z-index: 20;
 `;
 
 const Col = styled.div`
@@ -113,7 +114,7 @@ const Col = styled.div`
 
 const Logo = styled(motion.svg)`
     margin-right: 50px;
-    width: 95px;
+    width: 5vw;
     height: 25px;
     fill: ${(props) => props.theme.red};
     path {

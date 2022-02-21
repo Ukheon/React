@@ -17,6 +17,7 @@ declare module "styled-components" {
             title: string;
             overview: string;
             item: string;
+            itemTitle: string;
         };
     }
 }

@@ -14,3 +14,33 @@ export const logoVariants = {
         },
     },
 };
+
+const width = window.outerWidth;
+const calcul = width / 100;
+
+export const rowVariants = {
+    start: (clickSencor: boolean) => ({
+        x: clickSencor ? width + calcul * 2 + 10 : -width - (calcul * 2 + 10),
+    }),
+    end: {
+        x: 0,
+    },
+    exit: (clickSencor: boolean) => ({
+        x: clickSencor ? -width - (calcul * 2 + 10) : width + calcul * 2 + 10,
+    }),
+};
+
+export const boxVariants = {
+    normal: {
+        scale: 1,
+    },
+    hover: {
+        scale: 1.3,
+        y: -50,
+        transition: {
+            delay: 0.5,
+            duaration: 0.3,
+            type: "tween",
+        },
+    },
+};

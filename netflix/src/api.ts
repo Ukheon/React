@@ -16,7 +16,7 @@ export interface IMovie {
 }
 
 export interface IMovieNow {
-    dates: {
+    dates?: {
         maximum: string;
         minimum: string;
     };
