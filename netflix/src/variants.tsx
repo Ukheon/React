@@ -35,12 +35,22 @@ export const boxVariants = {
         scale: 1,
     },
     hover: {
-        scale: 1.3,
+        scale: 1.5,
         y: -50,
+        zIndex: 10,
         transition: {
             delay: 0.5,
             duaration: 0.3,
             type: "tween",
+        },
+    },
+};
+
+export const itemTitleVariants = {
+    hover: {
+        opacity: 1,
+        transition: {
+            delay: 0.5,
         },
     },
 };

@@ -6,10 +6,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { rowVariants } from "../variants";
 import { arrayBuffer } from "stream/consumers";
-import HomeItem from "../Components/Home_Items";
+import HomeItem from "../Components/MovieSlider";
 
 const Home = () => {
     const { data, isLoading } = useQuery<IMovieNow>(["Movies", "nowPlaying"], getMovies);
+
     return (
         <Main>
             {isLoading ? (
@@ -60,6 +61,7 @@ const Title = styled.div`
 `;
 
 const Overview = styled.div`
-    width: 50%;
-    margin-left: 10px;
+    width: 50vw;
+    font-size: 1vw;
+    /* margin-left: 1vw; */
 `;

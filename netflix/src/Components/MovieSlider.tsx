@@ -2,9 +2,10 @@ import styled from "styled-components";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IMovieNow } from "../api";
-import { rowVariants, boxVariants } from "../variants";
+import { rowVariants, boxVariants, itemTitleVariants } from "../variants";
 import { makeImage } from "../utils";
-
+import { useParams, useNavigate } from "react-router-dom";
+import MovieDetail from "./MovieDetail";
 interface IData {
     data?: IMovieNow;
 }
@@ -13,6 +14,8 @@ const HomeItem = ({ data }: IData) => {
     const [slideIndex, setSlideIndex] = useState(0);
     const [clickSencor, setClickSencor] = useState(true);
     const [waitClick, setWaitClick] = useState(false);
+    const navigate = useNavigate();
+    const params = useParams<{ movieId: string | undefined }>();
     let Arr: number[] = [];
     for (let i = 0; i <= data!.total_pages - 1; i++) Arr.push(i);
     const increaseIndex = () => {
@@ -45,6 +48,7 @@ const HomeItem = ({ data }: IData) => {
                     <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
                 </LeftArrow>
                 <AnimatePresence initial={false} onExitComplete={() => setWaitClick(false)} custom={clickSencor}>
+                    {params.movieId ? <MovieDetail data={data} movieId={params.movieId}></MovieDetail> : null}
                     <Row
                         custom={clickSencor}
                         key={slideIndex}
@@ -57,13 +61,17 @@ const HomeItem = ({ data }: IData) => {
                         {data?.results.slice(slideIndex * 6, slideIndex * 6 + 6).map((data, index) => {
                             return (
                                 <Box
+                                    layoutId={data.id + ""}
+                                    onClick={() => {
+                                        navigate(`/movies/${data.id}`);
+                                    }}
                                     key={index}
                                     variants={boxVariants}
                                     whileHover="hover"
                                     initial="normal"
                                     bgimage={makeImage(data.backdrop_path || "", "w500")}
                                 >
-                                    <span>{data.title}</span>
+                                    <ItemTitle variants={itemTitleVariants}>{data.title}</ItemTitle>
                                 </Box>
                             );
                         })}
@@ -88,7 +96,9 @@ export default HomeItem;
 const Items = styled.div`
     height: 20vh;
     min-height: 35vh;
+    /* position: relative; */
 `;
+
 const Slider = styled.div`
     position: relative;
     top: -80px;
@@ -100,10 +110,6 @@ const Slider = styled.div`
         background-color: rgba(255, 255, 255, 0.1);
         position: absolute;
         z-index: 10;
-    }
-    div,
-    svg {
-        min-height: 24vh;
     }
 `;
 
@@ -117,22 +123,33 @@ const Row = styled(motion.div)`
 `;
 
 const Box = styled(motion.div)<{ bgimage: string }>`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
     font-size: ${(props) => props.theme.fontSize.item};
     background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${(props) => props.bgimage}),
         url("/images/notFound.jpg");
     background-size: cover;
+    width: 15vw;
     height: 20vh;
-
+    display: flex;
+    justify-content: center;
+    min-height: 24vh;
     &:first-child {
         transform-origin: center left;
     }
     &:last-child {
         transform-origin: center right;
     }
+`;
+
+const ItemTitle = styled(motion.h4)`
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    background-color: ${(props) => props.theme.black.darker};
+    width: 15vw;
+    font-size: ${(props) => props.theme.fontSize.default};
+    bottom: 0;
+    opacity: 0;
+    z-index: 0;
 `;
 
 const Tag = styled.span`
@@ -146,9 +163,9 @@ const PageList = styled.ul<{ page: number }>`
     position: absolute;
     display: grid;
     grid-template-columns: repeat(${(props) => props.page}, 1fr);
-    right: 3vw;
+    right: 2vw;
     width: 10vw;
-    gap: 1vw;
+    gap: 0.5vw;
     top: -3.5vh;
 `;
 
@@ -160,8 +177,10 @@ const Page = styled.li<{ flag: boolean }>`
 
 const LeftArrow = styled.svg`
     left: 0;
+    min-height: 24vh;
 `;
 
 const RightArrow = styled.svg`
     right: 0;
+    min-height: 24vh;
 `;

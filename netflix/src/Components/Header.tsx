@@ -5,7 +5,9 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import { getMovies } from "../api";
 const Header = () => {
+    const isHome = useMatch("/");
     const isTv = useMatch("/tv");
+    const isMovie = useMatch("/movie");
     const themeContext = useContext(ThemeContext);
     const [searchOpen, setSearchOpen] = useState(true);
     const clickAnimation = useAnimation();
@@ -67,9 +69,13 @@ const Header = () => {
                     <AnimatePresence>
                         <Item key="1">
                             <Link to="/">Home</Link>
-                            {!isTv ? <NavBorder layoutId="navBorder" /> : null}
+                            {isHome ? <NavBorder layoutId="navBorder" /> : null}
                         </Item>
-                        <Item key="2">
+                        {/* <Item key="2">
+                            <Link to="/movie">Movie</Link>
+                            {isMovie ? <NavBorder layoutId="navBorder" /> : null}
+                        </Item> */}
+                        <Item key="3">
                             <Link to="/tv">Tv Show</Link>
                             {isTv ? <NavBorder layoutId="navBorder" /> : null}
                         </Item>
