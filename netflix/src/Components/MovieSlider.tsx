@@ -6,11 +6,14 @@ import { rowVariants, boxVariants, itemTitleVariants } from "../variants";
 import { makeImage } from "../utils";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieDetail from "./MovieDetail";
+import { HiddenState } from "../Atom";
+import { useRecoilState } from "recoil";
 interface IData {
     data?: IMovieNow;
 }
 
 const HomeItem = ({ data }: IData) => {
+    const [clickHidden, setClickHidden] = useRecoilState(HiddenState);
     const [slideIndex, setSlideIndex] = useState(0);
     const [clickSencor, setClickSencor] = useState(true);
     const [waitClick, setWaitClick] = useState(false);
@@ -63,6 +66,7 @@ const HomeItem = ({ data }: IData) => {
                                 <Box
                                     layoutId={data.id + ""}
                                     onClick={() => {
+                                        setClickHidden(true);
                                         navigate(`/movies/${data.id}`);
                                     }}
                                     key={index}

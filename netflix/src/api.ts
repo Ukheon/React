@@ -47,14 +47,12 @@ export interface Genre {
     name: string;
 }
 
-export interface IDetail {
-    id: number;
-    genres: Genre[];
+export interface IMovieDetail {
     title: string;
-    imdb_id: string;
+    genres: Genre[]; // 장르
     tagline: string; // 요약
     status: string; // 상영중
-    release_date: string;
-    runtime: number;
-    vote_average: number;
+    release_date: string; // 상영날짜
+    runtime: number; // 런타임
+    vote_average: number; // 평점
 }

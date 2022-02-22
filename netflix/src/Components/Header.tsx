@@ -4,6 +4,8 @@ import { logoVariants } from "../variants";
 import { useContext, useEffect, useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import { getMovies } from "../api";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { HiddenState } from "../Atom";
 const Header = () => {
     const isHome = useMatch("/");
     const isTv = useMatch("/tv");
@@ -13,6 +15,7 @@ const Header = () => {
     const clickAnimation = useAnimation();
     const { scrollY } = useViewportScroll();
     const navAnimation = useAnimation();
+    const showing = useRecoilValue(HiddenState);
     const inputClick = () => {
         if (searchOpen) {
             clickAnimation.start({
@@ -26,6 +29,13 @@ const Header = () => {
         setSearchOpen(!searchOpen);
     };
     useEffect(() => {
+        if (showing) {
+            navAnimation.start({
+                backgroundColor: "rgba(0,0,0,0.1)",
+            });
+            return;
+        }
+
         scrollY.onChange(() => {
             if (scrollY.get() > 99) {
                 navAnimation.start({
@@ -37,7 +47,7 @@ const Header = () => {
                 });
             }
         });
-    }, [scrollY]);
+    }, [scrollY, showing]);
 
     return (
         <Nav
@@ -110,7 +120,7 @@ const Nav = styled(motion.nav)`
     top: 0;
     font-size: ${(props) => props.theme.fontSize.default};
     padding: 20px 60px;
-    z-index: 20;
+    z-index: 10;
 `;
 
 const Col = styled.div`
