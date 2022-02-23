@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getMovies, IMovieNow } from "../api";
+import { getMovies, getMoviesPopular, getMoviesTopRate, getMoviesUpcoming, IMovieNow } from "../api";
 import styled from "styled-components";
 import { makeImage } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,11 +9,14 @@ import { arrayBuffer } from "stream/consumers";
 import HomeItem from "../Components/MovieSlider";
 
 const Home = () => {
-    const { data, isLoading } = useQuery<IMovieNow>(["Movies", "nowPlaying"], getMovies);
+    const { data, isLoading: nowLoading } = useQuery<IMovieNow>(["Movies", "nowPlaying"], getMovies);
+    const { data: topRated, isLoading: rateLoading } = useQuery<IMovieNow>(["Movies", "topRated"], getMoviesTopRate);
+    const { data: popular, isLoading: popularLoading } = useQuery<IMovieNow>(["Movies", "popular"], getMoviesPopular);
 
+    const loading = nowLoading || rateLoading || popularLoading;
     return (
         <Main>
-            {isLoading ? (
+            {loading ? (
                 <Loader></Loader>
             ) : (
                 <>
@@ -21,8 +24,9 @@ const Home = () => {
                         <Title>{data?.results[0].title}</Title>
                         <Overview>{data?.results[0].overview}</Overview>
                     </Banner>
-                    <HomeItem data={data}></HomeItem>
-                    {/* <HomeItem data={data}></HomeItem> */}
+                    <HomeItem unique="1key" tag="TOP 영화" data={topRated}></HomeItem>
+                    <HomeItem unique="2key" tag="최신 영화" data={data}></HomeItem>
+                    <HomeItem unique="3key" tag="인기 영화" data={popular}></HomeItem>
                 </>
             )}
         </Main>
@@ -33,7 +37,7 @@ export default Home;
 
 const Main = styled.div`
     background-color: ${(props) => props.theme.black.veryDark};
-    height: 200vh;
+    height: 240vh;
 `;
 
 const Loader = styled.div`

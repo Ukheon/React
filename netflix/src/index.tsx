@@ -77,7 +77,7 @@ ReactDOM.render(
                 <ThemeProvider theme={theme}>
                     <GlobalStyle />
                     <App />
-                    <ReactQueryDevtools initialIsOpen={true}></ReactQueryDevtools>
+                    {/* <ReactQueryDevtools initialIsOpen={true}></ReactQueryDevtools> */}
                 </ThemeProvider>
             </QueryClientProvider>
         </RecoilRoot>

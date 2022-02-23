@@ -4,13 +4,17 @@ import styled from "styled-components";
 import { getMoviesDetail, getVideos, IMovieNow } from "../api";
 import { useQuery } from "react-query";
 import ReactPlayer from "react-player";
-import { useSetRecoilState } from "recoil";
-import { HiddenState } from "../Atom";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { HiddenArrow, HiddenState, ShowSimilar } from "../Atom";
+
+import Similar from "./MovieSimilar";
+import { useEffect, useState } from "react";
 
 const YoutubeUrl = "https://www.youtube.com/watch?v=";
 interface IDetail {
     movieId: string;
     data?: IMovieNow;
+    unique: string;
 }
 
 interface IVideoResult {
@@ -37,27 +41,40 @@ interface IMovieDetail {
     overview: string;
 }
 
-const MovieDetail = ({ data, movieId }: IDetail) => {
-    const { data: videoData, isLoading } = useQuery<IVideo>(["Movie", "what"], () => {
-        return getVideos(movieId);
+const MovieDetail = ({ movieId, unique }: IDetail) => {
+    const { data: videoDataEn, isLoading: enLoading } = useQuery<IVideo>(["Movie2", `video${movieId}en`], () => {
+        return getVideos(movieId, "en-US");
     });
-    const { data: detail, isLoading: detailLoading } = useQuery<IMovieDetail>(["Movie", "Detail"], () => {
+    const { data: videoData, isLoading } = useQuery<IVideo>(["Movie", `video${movieId}ko`], () => {
+        return getVideos(movieId, "ko");
+    });
+    const { data: detail, isLoading: detailLoading } = useQuery<IMovieDetail>(["Movie", `Detail${movieId}`], () => {
         return getMoviesDetail(movieId);
     });
     const setHidden = useSetRecoilState(HiddenState);
-
     const Navigate = useNavigate();
-    const loading = isLoading || detailLoading;
+    const setArrowHidden = useSetRecoilState(HiddenArrow);
+    const [showSimilar, setShowSimilar] = useRecoilState(ShowSimilar);
+    const [validVideo, setValidVideo] = useState(false);
+    let [urlArr, setUrlArr] = useState<string[]>([]);
+    const loading = isLoading || detailLoading || enLoading;
 
-    let urlArr: string[] = [];
-    if (loading) return <div></div>;
-    for (let i = 0; i < videoData!.results.length; i++) {
-        urlArr.push(`${YoutubeUrl}${videoData?.results[i].key}`);
+    useEffect(() => {
+        console.log("here?");
+    }, [urlArr]);
+    if (loading) return null;
+    let tempArr: string[] = [];
+    for (let i = 0; i < videoDataEn!.results.length; i++) {
+        tempArr.push(`${YoutubeUrl}${videoDataEn?.results[i].key}`);
     }
+    for (let i = 0; i < videoData!.results.length; i++) {
+        tempArr.push(`${YoutubeUrl}${videoData?.results[i].key}`);
+    }
+    urlArr = [...tempArr];
+
     const stopProps = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
     };
-
     return (
         <Movies
             initial={{
@@ -72,9 +89,12 @@ const MovieDetail = ({ data, movieId }: IDetail) => {
             onClick={() => {
                 Navigate("/");
                 setHidden(false);
+                setArrowHidden(false);
+                setShowSimilar(false);
             }}
         >
             <ShowDetail
+                layoutId={movieId + unique}
                 onClick={stopProps}
                 initial={{ opacity: 1 }}
                 animate={{
@@ -84,10 +104,19 @@ const MovieDetail = ({ data, movieId }: IDetail) => {
                         duration: 0.3,
                     },
                 }}
-                layoutId={movieId + ""}
                 exit={{ opacity: 0 }}
             >
-                <ReactPlayer autoplay width="60vw" height="60vh" playing={true} url={[...urlArr]}></ReactPlayer>
+                <ReactPlayer
+                    onStart={() => {
+                        setValidVideo(true);
+                    }}
+                    volume={0.3}
+                    width="60vw"
+                    height="60vh"
+                    playing
+                    muted={false}
+                    url={urlArr}
+                ></ReactPlayer>
                 <TextDetail>
                     <ExplainHard>
                         <div>
@@ -118,9 +147,13 @@ const MovieDetail = ({ data, movieId }: IDetail) => {
                             <h1>시간:&nbsp;</h1>
                             {detail?.runtime}분
                         </div>
+                        <div>
+                            <h2 onClick={() => setShowSimilar(true)}>비슷한 컨텐츠</h2>
+                        </div>
                     </ExplainSoft>
                 </TextDetail>
             </ShowDetail>
+            {showSimilar ? <Similar movieId={movieId}></Similar> : ""}
         </Movies>
     );
 };
@@ -231,6 +264,7 @@ const ExplainSoft = styled.div`
             top: -0.1vh;
         }
         &:last-child {
+            height: 8vh;
         }
     }
 
@@ -240,6 +274,14 @@ const ExplainSoft = styled.div`
         font-weight: bold;
     }
     h2 {
+        text-decoration: underline;
+        cursor: pointer;
+        color: #b3b3ff;
+        margin-top: 4vh;
+        font-size: 1.2vw;
+        &:hover {
+            color: ${(props) => props.theme.white.darker};
+        }
     }
 
     h5 {

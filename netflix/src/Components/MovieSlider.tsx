@@ -6,25 +6,35 @@ import { rowVariants, boxVariants, itemTitleVariants } from "../variants";
 import { makeImage } from "../utils";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieDetail from "./MovieDetail";
-import { HiddenState } from "../Atom";
-import { useRecoilState } from "recoil";
+import { HiddenArrow, HiddenState } from "../Atom";
+import { useRecoilState, useRecoilValue } from "recoil";
 interface IData {
     data?: IMovieNow;
+    tag: string;
+    unique: string;
 }
 
-const HomeItem = ({ data }: IData) => {
+interface IParam {
+    movieId: string | undefined;
+    key: string | undefined;
+}
+
+const HomeItem = ({ data, tag, unique }: IData) => {
     const [clickHidden, setClickHidden] = useRecoilState(HiddenState);
+    const [arrowHidden, setArrowHidden] = useRecoilState(HiddenArrow);
     const [slideIndex, setSlideIndex] = useState(0);
     const [clickSencor, setClickSencor] = useState(true);
     const [waitClick, setWaitClick] = useState(false);
+
     const navigate = useNavigate();
-    const params = useParams<{ movieId: string | undefined }>();
+    const params = useParams<{ movieId: string | undefined; key: string | undefined }>();
     let Arr: number[] = [];
-    for (let i = 0; i <= data!.total_pages - 1; i++) Arr.push(i);
+    for (let i = 0; i < Math.floor(data!.results.length / 6); i++) Arr.push(i);
     const increaseIndex = () => {
         if (waitClick) return;
         setWaitClick(true);
-        if (slideIndex < data!.total_pages - 1) {
+
+        if (slideIndex < Math.floor(data!.results.length / 6) - 1) {
             setSlideIndex((index) => index + 1);
         } else {
             setSlideIndex(0);
@@ -46,12 +56,20 @@ const HomeItem = ({ data }: IData) => {
     };
     return (
         <Items>
-            <Slider>
-                <LeftArrow onClick={decreaseIndex} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+            <Slider show={arrowHidden}>
+                <LeftArrow
+                    onClick={decreaseIndex}
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={1000}
+                    height={200}
+                    viewBox="0 0 256 512"
+                >
                     <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />
                 </LeftArrow>
                 <AnimatePresence initial={false} onExitComplete={() => setWaitClick(false)} custom={clickSencor}>
-                    {params.movieId ? <MovieDetail data={data} movieId={params.movieId}></MovieDetail> : null}
+                    {unique === params.key && params.movieId ? (
+                        <MovieDetail data={data} movieId={params.movieId} unique={unique}></MovieDetail>
+                    ) : null}
                     <Row
                         custom={clickSencor}
                         key={slideIndex}
@@ -64,10 +82,11 @@ const HomeItem = ({ data }: IData) => {
                         {data?.results.slice(slideIndex * 6, slideIndex * 6 + 6).map((data, index) => {
                             return (
                                 <Box
-                                    layoutId={data.id + ""}
+                                    layoutId={data.id + unique}
                                     onClick={() => {
+                                        setArrowHidden(true);
                                         setClickHidden(true);
-                                        navigate(`/movies/${data.id}`);
+                                        navigate(`/movies/${unique}/${data.id}`);
                                     }}
                                     key={index}
                                     variants={boxVariants}
@@ -81,8 +100,8 @@ const HomeItem = ({ data }: IData) => {
                         })}
                     </Row>
                 </AnimatePresence>
-                <Tag>현재 상영중</Tag>
-                <PageList page={data!.total_pages + 1}>
+                <Tag>{tag}</Tag>
+                <PageList page={Math.floor(data!.results.length / 6)}>
                     {Arr.map((key) => {
                         return <Page key={key} flag={key === slideIndex}></Page>;
                     })}
@@ -100,16 +119,16 @@ export default HomeItem;
 const Items = styled.div`
     height: 20vh;
     min-height: 35vh;
-    /* position: relative; */
 `;
 
-const Slider = styled.div`
+const Slider = styled.div<{ show: boolean }>`
     position: relative;
     top: -80px;
     > svg {
-        width: 2vw;
+        width: 0.7vw;
         padding: 0 10px;
         height: 20vh;
+        opacity: ${(props) => (props.show ? "0" : "1")};
         fill: ${(props) => props.theme.white.darker};
         background-color: rgba(255, 255, 255, 0.1);
         position: absolute;
@@ -122,8 +141,8 @@ const Row = styled(motion.div)`
     gap: 1vw;
     grid-template-columns: repeat(6, 1fr);
     position: absolute;
-    left: 2vw;
-    width: 96vw;
+    left: 1vw;
+    width: 97vw;
 `;
 
 const Box = styled(motion.div)<{ bgimage: string }>`
@@ -153,7 +172,6 @@ const ItemTitle = styled(motion.h4)`
     font-size: ${(props) => props.theme.fontSize.default};
     bottom: 0;
     opacity: 0;
-    z-index: 0;
 `;
 
 const Tag = styled.span`
