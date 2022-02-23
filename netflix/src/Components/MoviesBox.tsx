@@ -27,7 +27,7 @@ const MoviesBox = ({ data, tag }: IData) => {
         setArrowHidden(true);
         setClickHidden(true);
         setSimilar(false);
-        navigate(`/movies/${id}`);
+        navigate(`/movies/1key/${id}`);
     };
 
     return (

@@ -42,11 +42,8 @@ interface IMovieDetail {
 }
 
 const MovieDetail = ({ movieId, unique }: IDetail) => {
-    const { data: videoDataEn, isLoading: enLoading } = useQuery<IVideo>(["Movie2", `video${movieId}en`], () => {
-        return getVideos(movieId, "en-US");
-    });
     const { data: videoData, isLoading } = useQuery<IVideo>(["Movie", `video${movieId}ko`], () => {
-        return getVideos(movieId, "ko");
+        return getVideos(movieId, "en_US");
     });
     const { data: detail, isLoading: detailLoading } = useQuery<IMovieDetail>(["Movie", `Detail${movieId}`], () => {
         return getMoviesDetail(movieId);
@@ -55,18 +52,11 @@ const MovieDetail = ({ movieId, unique }: IDetail) => {
     const Navigate = useNavigate();
     const setArrowHidden = useSetRecoilState(HiddenArrow);
     const [showSimilar, setShowSimilar] = useRecoilState(ShowSimilar);
-    const [validVideo, setValidVideo] = useState(false);
-    let [urlArr, setUrlArr] = useState<string[]>([]);
-    const loading = isLoading || detailLoading || enLoading;
+    let urlArr: string[] = [];
+    const loading = isLoading || detailLoading;
 
-    useEffect(() => {
-        console.log("here?");
-    }, [urlArr]);
     if (loading) return null;
     let tempArr: string[] = [];
-    for (let i = 0; i < videoDataEn!.results.length; i++) {
-        tempArr.push(`${YoutubeUrl}${videoDataEn?.results[i].key}`);
-    }
     for (let i = 0; i < videoData!.results.length; i++) {
         tempArr.push(`${YoutubeUrl}${videoData?.results[i].key}`);
     }
@@ -106,17 +96,7 @@ const MovieDetail = ({ movieId, unique }: IDetail) => {
                 }}
                 exit={{ opacity: 0 }}
             >
-                <ReactPlayer
-                    onStart={() => {
-                        setValidVideo(true);
-                    }}
-                    volume={0.3}
-                    width="60vw"
-                    height="60vh"
-                    playing
-                    muted={false}
-                    url={urlArr}
-                ></ReactPlayer>
+                <ReactPlayer volume={0.3} width="60vw" height="60vh" playing muted={false} url={urlArr}></ReactPlayer>
                 <TextDetail>
                     <ExplainHard>
                         <div>

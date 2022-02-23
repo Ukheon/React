@@ -54,3 +54,19 @@ export const itemTitleVariants = {
         },
     },
 };
+
+export const answerVariants = {
+    start: {
+        zIndex: 10,
+        scale: 0.5,
+        color: "blue",
+        background: "linear-gradient(#ff0000, #2600ff)",
+    },
+    end: {
+        scale: 1,
+        background: "linear-gradient(#181818, #181818)",
+        transition: {
+            duration: 0.3,
+        },
+    },
+};
