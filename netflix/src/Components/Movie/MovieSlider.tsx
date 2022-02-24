@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { IMovieNow } from "../api";
-import { rowVariants, boxVariants, itemTitleVariants } from "../variants";
-import { makeImage } from "../utils";
+import { IMovieNow } from "../../api";
+import { rowVariants, boxVariants, itemTitleVariants } from "../../variants";
+import { makeImage } from "../../utils";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieDetail from "./MovieDetail";
-import { HiddenArrow, HiddenState } from "../Atom";
+import { HiddenArrow, HiddenState } from "../../Atom";
 import { useRecoilState, useRecoilValue } from "recoil";
 interface IData {
     data?: IMovieNow;
@@ -68,7 +68,7 @@ const HomeItem = ({ data, tag, unique }: IData) => {
                 </LeftArrow>
                 <AnimatePresence initial={false} onExitComplete={() => setWaitClick(false)} custom={clickSencor}>
                     {unique === params.key && params.movieId ? (
-                        <MovieDetail data={data} movieId={params.movieId} unique={unique}></MovieDetail>
+                        <MovieDetail data={data} movieId={params.movieId} unique={unique} type={"movie"}></MovieDetail>
                     ) : null}
                     <Row
                         custom={clickSencor}
@@ -155,10 +155,10 @@ const Box = styled(motion.div)<{ bgimage: string }>`
     display: flex;
     justify-content: center;
     min-height: 24vh;
-    &:first-child {
+    &:nth-child(6n) {
         transform-origin: center left;
     }
-    &:last-child {
+    &:nth-child(7n) {
         transform-origin: center right;
     }
 `;

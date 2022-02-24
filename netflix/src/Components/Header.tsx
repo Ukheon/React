@@ -1,21 +1,26 @@
-import styled, { ThemeContext } from "styled-components";
-import { motion, AnimatePresence, useAnimation, useViewportScroll, useTransform } from "framer-motion";
+import styled from "styled-components";
+import { motion, AnimatePresence, useAnimation, useViewportScroll } from "framer-motion";
 import { logoVariants } from "../variants";
-import { useContext, useEffect, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
-import { getMovies } from "../api";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useMatch, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import { HiddenState } from "../Atom";
+import { useForm } from "react-hook-form";
+
+interface IForm {
+    keyword: string;
+}
+
 const Header = () => {
-    const isHome = useMatch("/");
+    const isMovies = useMatch("/movies");
     const isTv = useMatch("/tv");
-    const isMovie = useMatch("/movie");
-    const themeContext = useContext(ThemeContext);
     const [searchOpen, setSearchOpen] = useState(true);
     const clickAnimation = useAnimation();
     const { scrollY } = useViewportScroll();
     const navAnimation = useAnimation();
     const showing = useRecoilValue(HiddenState);
+    const { register, handleSubmit, setValue } = useForm<IForm>();
+    const Navigate = useNavigate();
     const inputClick = () => {
         if (searchOpen) {
             clickAnimation.start({
@@ -49,6 +54,10 @@ const Header = () => {
         });
     }, [scrollY, showing]);
 
+    const onSubmit = (data: IForm) => {
+        Navigate(`/search?keyword=${data.keyword}`);
+        setValue("keyword", "");
+    };
     return (
         <Nav
             initial={{ backgroundColor: "rgba(0,0,0,0.1)" }}
@@ -63,7 +72,7 @@ const Header = () => {
             }}
         >
             <Col>
-                <Link to="/test">
+                <Link to="/">
                     <Logo
                         variants={logoVariants}
                         whileHover="active"
@@ -80,8 +89,8 @@ const Header = () => {
                 <Items>
                     <AnimatePresence>
                         <Item key="1">
-                            <Link to="/">Home</Link>
-                            {isHome ? <NavBorder layoutId="navBorder" /> : null}
+                            <Link to="/movies">Movies</Link>
+                            {isMovies ? <NavBorder layoutId="navBorder" /> : null}
                         </Item>
                         <Item key="3">
                             <Link to="/tv">Tv Show</Link>
@@ -91,8 +100,13 @@ const Header = () => {
                 </Items>
             </Col>
             <Col>
-                <Search>
-                    <Input initial={{ scaleX: 0 }} animate={clickAnimation} placeholder="Search"></Input>
+                <Search onSubmit={handleSubmit(onSubmit)}>
+                    <Input
+                        {...register("keyword", { required: true, minLength: 2 })}
+                        initial={{ scaleX: 0 }}
+                        animate={clickAnimation}
+                        placeholder="Search"
+                    ></Input>
                     <motion.svg
                         animate={{ x: !searchOpen ? -200 : 0 }}
                         onClick={inputClick}
@@ -115,6 +129,7 @@ const Nav = styled(motion.nav)`
     align-items: center;
     position: fixed;
     width: 100vw;
+    height: 3vh;
     top: 0;
     font-size: ${(props) => props.theme.fontSize.default};
     padding: 20px 60px;
@@ -162,7 +177,7 @@ const NavBorder = styled(motion.div)`
     background-color: transparent;
 `;
 
-const Search = styled.span`
+const Search = styled.form`
     color: white;
     display: flex;
     align-items: center;

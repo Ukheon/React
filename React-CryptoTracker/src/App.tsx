@@ -76,7 +76,7 @@ function App() {
             <ThemeProvider theme={isDark ? lightTheme : darkTheme}>
                 <GlobalStyle />
                 <Router />
-                <Router />
+                
                 <ReactQueryDevtools initialIsOpen={true} />
             </ThemeProvider>
         </>

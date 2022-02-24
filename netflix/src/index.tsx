@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
-tml, body, div, span, applet, object, iframe,
+html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
@@ -26,6 +26,7 @@ time, mark, audio, video {
 	border: 0;
 	font-size: 100%;
 	font: inherit;
+	/* box-sizing: border-box; */
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -59,6 +60,7 @@ body {
 	font-weight: 300;
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 14px;
+	background-color: ${(props) => props.theme.black.veryDark};
 	color: ${(props) => props.theme.white.lighter};
 	line-height: 1.2;
 }

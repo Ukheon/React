@@ -6,13 +6,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { rowVariants } from "../variants";
 import { arrayBuffer } from "stream/consumers";
-import HomeItem from "../Components/MovieSlider";
+import HomeItem from "../Components/Movie/MovieSlider";
 
 const Movie = () => {
     const { data, isLoading: nowLoading } = useQuery<IMovieNow>(["Movies", "nowPlaying"], getMovies);
     const { data: topRated, isLoading: rateLoading } = useQuery<IMovieNow>(["Movies", "topRated"], getMoviesTopRate);
     const { data: popular, isLoading: popularLoading } = useQuery<IMovieNow>(["Movies", "popular"], getMoviesPopular);
-
     const loading = nowLoading || rateLoading || popularLoading;
     return (
         <Main>
@@ -37,7 +36,7 @@ export default Movie;
 
 const Main = styled.div`
     background-color: ${(props) => props.theme.black.veryDark};
-    height: 240vh;
+    height: 210vh;
 `;
 
 const Loader = styled.div`

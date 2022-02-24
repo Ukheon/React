@@ -53,10 +53,18 @@ export const getMoviesDetail = async (id: string) => {
     return await fetch(`${BASE_URL}movie/${id}?api_key=${API_KEY}&language=ko`).then((res) => res.json());
 };
 
-export const getVideos = async (id: string, language: string) => {
-    return await fetch(`${BASE_URL}movie/${id}/videos?api_key=${API_KEY}&language=${language}`).then((res) =>
-        res.json()
-    );
+export const getSearchDetail = async (id: string, type: string) => {
+    return await fetch(`${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=ko`).then((res) => res.json());
+};
+
+export const getVideos = async (id: string, type: string) => {
+    return await fetch(`${BASE_URL}${type}/${id}/videos?api_key=${API_KEY}&language=en-US`).then((res) => res.json());
+};
+
+export const getSearch = async (keyword: string) => {
+    return await fetch(
+        `${BASE_URL}search/multi?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
+    ).then((res) => res.json());
 };
 
 export default {};

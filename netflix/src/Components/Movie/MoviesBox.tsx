@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { IMovieNow } from "../api";
-import { rowVariants, boxVariants, itemTitleVariants } from "../variants";
-import { makeImage } from "../utils";
+import { IMovieNow } from "../../api";
+import { rowVariants, boxVariants, itemTitleVariants } from "../../variants";
+import { makeImage } from "../../utils";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieDetail from "./MovieDetail";
-import { HiddenArrow, HiddenState, ShowSimilar } from "../Atom";
+import { HiddenArrow, HiddenState, ShowSimilar } from "../../Atom";
 import { useSetRecoilState } from "recoil";
 
 interface IData {
@@ -27,7 +27,7 @@ const MoviesBox = ({ data, tag }: IData) => {
         setArrowHidden(true);
         setClickHidden(true);
         setSimilar(false);
-        navigate(`/movies/1key/${id}`);
+        navigate(`/search?keyword=학교&id=${id}`);
     };
 
     return (
@@ -45,7 +45,7 @@ const MoviesBox = ({ data, tag }: IData) => {
                         <Box
                             layoutId={data.id + ""}
                             onClick={(event) => {
-                                similarEvent(event, data.id);
+                                similarEvent(event, data.id, data.);
                             }}
                             key={index}
                             variants={boxVariants}

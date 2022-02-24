@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { useQuery } from "react-query";
-import { getMoviesSimilar } from "../api";
+import { getMoviesSimilar } from "../../api";
 
 import MoviesBox from "./MoviesBox";
 import { useSetRecoilState } from "recoil";
-import { ShowSimilar } from "../Atom";
+import { ShowSimilar } from "../../Atom";
 import { useState } from "react";
 interface ISimilar {
     movieId: string;

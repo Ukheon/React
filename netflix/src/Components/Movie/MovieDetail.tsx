@@ -1,20 +1,19 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getMoviesDetail, getVideos, IMovieNow } from "../api";
+import { getMoviesDetail, getSearchDetail, getVideos, IMovieNow } from "../../api";
 import { useQuery } from "react-query";
 import ReactPlayer from "react-player";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { HiddenArrow, HiddenState, ShowSimilar } from "../Atom";
-
+import { HiddenArrow, HiddenState, ShowSimilar } from "../../Atom";
 import Similar from "./MovieSimilar";
-import { useEffect, useState } from "react";
 
 const YoutubeUrl = "https://www.youtube.com/watch?v=";
 interface IDetail {
     movieId: string;
     data?: IMovieNow;
     unique: string;
+    type: string;
 }
 
 interface IVideoResult {
@@ -31,6 +30,7 @@ interface Genre {
 }
 
 interface IMovieDetail {
+    name: string;
     title: string;
     genres: Genre[];
     tagline: string;
@@ -39,14 +39,15 @@ interface IMovieDetail {
     vote_average: number;
     vote_count: number;
     overview: string;
+    first_air_date: string;
 }
 
-const MovieDetail = ({ movieId, unique }: IDetail) => {
+const MovieDetail = ({ movieId, unique, type }: IDetail) => {
     const { data: videoData, isLoading } = useQuery<IVideo>(["Movie", `video${movieId}ko`], () => {
-        return getVideos(movieId, "en_US");
+        return getVideos(movieId, type);
     });
     const { data: detail, isLoading: detailLoading } = useQuery<IMovieDetail>(["Movie", `Detail${movieId}`], () => {
-        return getMoviesDetail(movieId);
+        return getSearchDetail(movieId, type);
     });
     const setHidden = useSetRecoilState(HiddenState);
     const Navigate = useNavigate();
@@ -77,7 +78,7 @@ const MovieDetail = ({ movieId, unique }: IDetail) => {
                 backgroundColor: "rgba(0,0,0,0)",
             }}
             onClick={() => {
-                Navigate("/");
+                Navigate(-1);
                 setHidden(false);
                 setArrowHidden(false);
                 setShowSimilar(false);
@@ -100,36 +101,52 @@ const MovieDetail = ({ movieId, unique }: IDetail) => {
                 <TextDetail>
                     <ExplainHard>
                         <div>
-                            {detail?.title}
-                            <p>
-                                <h2>출시:&nbsp;</h2> {detail?.release_date}
-                            </p>
+                            {type === "movie" ? detail?.title : detail?.name}
+                            {type === "movie" ? (
+                                <p>
+                                    <h2>출시:&nbsp;</h2> {detail?.release_date}
+                                </p>
+                            ) : (
+                                <p>
+                                    <h2>방영일: &nbsp;</h2> {detail?.first_air_date}
+                                </p>
+                            )}
                         </div>
-                        <div>
-                            <h1 style={{ marginBottom: "0.5vh" }}>{detail?.tagline}</h1>
-                            {detail?.overview}
-                        </div>
+                        {detail?.overview ? (
+                            <div>
+                                <h1 style={{ marginBottom: "0.5vh" }}>{detail?.tagline}</h1>
+                                {detail?.overview}
+                            </div>
+                        ) : (
+                            <div>줄거리가 없습니다</div>
+                        )}
                     </ExplainHard>
                     <ExplainSoft>
-                        <div>
-                            <h1>평점:&nbsp;</h1> {detail?.vote_average} / 10
-                        </div>
-                        <div>
-                            <h1>장르:</h1>
-                            {detail?.genres.slice(0, 4).map((data, index) => (
+                        {type === "movie" ? (
+                            <>
                                 <div>
-                                    {data.name}
-                                    {detail.genres.length - 1 === index ? "" : ","}
+                                    <h1>평점:&nbsp;</h1> {detail?.vote_average} / 10
                                 </div>
-                            ))}
-                        </div>
-                        <div>
-                            <h1>시간:&nbsp;</h1>
-                            {detail?.runtime}분
-                        </div>
-                        <div>
-                            <h2 onClick={() => setShowSimilar(true)}>비슷한 컨텐츠</h2>
-                        </div>
+                                <div>
+                                    <h1>장르:</h1>
+                                    {detail?.genres.slice(0, 4).map((data, index) => (
+                                        <div>
+                                            {data.name}
+                                            {detail.genres.length - 1 === index ? "" : ","}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div>
+                                    <h1>시간:&nbsp;</h1>
+                                    {detail?.runtime}분
+                                </div>
+                                <div>
+                                    <h2 onClick={() => setShowSimilar(true)}>비슷한 컨텐츠</h2>
+                                </div>
+                            </>
+                        ) : (
+                            <div>TV Program.</div>
+                        )}
                     </ExplainSoft>
                 </TextDetail>
             </ShowDetail>
@@ -143,6 +160,7 @@ export default MovieDetail;
 const Movies = styled(motion.div)`
     width: 100vw;
     height: 100vh;
+
     position: fixed;
     z-index: 1;
     top: 0;

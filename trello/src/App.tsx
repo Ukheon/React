@@ -92,6 +92,9 @@ function App() {
     const newBoard = useSetRecoilState(toDoChange);
     const [value, setValue] = useState<string>("");
 
+
+
+    
     useEffect(() => {
         if (getData() !== null) {
             setToDo(() => {
@@ -235,7 +238,7 @@ function App() {
                 <AddBoard>
                     <div>
                         <input type="text" placeholder="ADD BOARD" onChange={onChange} value={value}></input>
-                        <span onClick={addBoard}>✖️</span>
+                        <span onClick={addBoard}>➕</span>
                     </div>
                 </AddBoard>
                 <DeleteToDo>

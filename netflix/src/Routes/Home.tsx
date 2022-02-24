@@ -1,27 +1,32 @@
 import ReactPlayer from "react-player";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import { useState } from "react";
-import { answerVariants } from "../variants";
+
+const ItemList = [
+    {
+        title: "학습 2022.02.07 ~ 2022.02.25",
+        text: "ReactQuery, ReactRouterDom-V6\n React-Player, *Recoil*, useForm\n Framer-Motion & React-beautiful-dnd: Awesome!\n CSS vw, vh, linear-gradation styled-component Theme: 너무좋았다.\n ApexChart&React-Helmet: coming soon?\n Typescript: 힘들다.",
+    },
+    {
+        title: "NormadCoder",
+        text: "클론코딩에서 많은것을 배웠습니다.\n실제로 사용할 수 있는 여러 방법을 배우게됩니다.",
+    },
+];
 
 const Home = () => {
-    const [idx, setIdx] = useState(0);
-    const toggleIdx = (event: React.MouseEvent<HTMLDivElement>, num: number) => {
-        event.stopPropagation();
-        setIdx(num);
-    };
     return (
         <Main>
             <Header>
                 <Text>
                     <h1>
-                        영화와 시리즈를
+                        영화와 시리즈 정보를
                         <br></br>
                         무료로 볼 수 있는.
                     </h1>
                     <h2>컴퓨터 환경에서 시청하세요. 언제든 구경할 수 있습니다.</h2>
-                    <Link to="/">
+                    <Link to="/movies">
                         <h3>시작하기</h3>
                     </Link>
                 </Text>
@@ -51,76 +56,61 @@ const Home = () => {
                     </div>
                 </SectionOne>
                 <SectionTwo>
-                    <AnimatePresence>
-                        <Test layoutId="50" onClick={() => setIdx(10)}>
-                            ㅎㅇ
-                        </Test>
-                        {idx === 10 ? (
-                            <motion.div
-                                layoutId="10"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ opacity: 0 }}
-                                style={{ width: "300px", height: "300px" }}
-                            >
-                                안니용
-                            </motion.div>
-                        ) : null}
-                        <Col onClick={() => setIdx(0)}>
-                            <Question layoutId="10" onClick={(event) => toggleIdx(event, 1)}>
-                                안녕하세요! ➕
-                            </Question>
-                            {idx === 1 ? (
-                                <Answer
-                                    variants={answerVariants}
-                                    initial="start"
-                                    animate={"end"}
-                                    exit={{
-                                        scale: 0,
-                                        backgroundColor: "white",
-                                        transition: {
-                                            duration: 5,
-                                        },
-                                    }}
-                                    // exit={{
-                                    //     scale: 0,
-                                    //     x: 100,
-                                    //     transition: {
-                                    //         duration: 5,
-                                    //     },
-                                    // }}
-                                >
-                                    kkkkkkkkkkkkkkkk
-                                </Answer>
-                            ) : null}
-
-                            <Question onClick={(event) => toggleIdx(event, 2)}>
-                                안녕하세요! ➕{idx === 2 ? <Answer>kkkkkkkkkkkkkkkk</Answer> : null}
-                            </Question>
-                            <Question onClick={(event) => toggleIdx(event, 3)}>
-                                안녕하세요! ➕{idx === 3 ? <Answer>kkkkkkkkkkkkkkkk</Answer> : null}
-                            </Question>
-                            <Question onClick={(event) => toggleIdx(event, 4)}>
-                                안녕하세요! ➕{idx === 4 ? <Answer>kkkkkkkkkkkkkkkk</Answer> : null}
-                            </Question>
-                            <Question onClick={(event) => toggleIdx(event, 5)}>
-                                안녕하세요! ➕{idx === 5 ? <Answer>kkkkkkkkkkkkkkkk</Answer> : null}
-                            </Question>
-                            <Question onClick={(event) => toggleIdx(event, 6)}>
-                                안녕하세요! ➕{idx === 6 ? <Answer>kkkkkkkkkkkkkkkk</Answer> : null}
-                            </Question>
+                    <AnimateSharedLayout>
+                        <Col layout>
+                            {ItemList.map((data) => {
+                                return <ListItem title={data.title} text={data.text}></ListItem>;
+                            })}
                         </Col>
-                    </AnimatePresence>
+                    </AnimateSharedLayout>
                 </SectionTwo>
             </Contents>
         </Main>
     );
 };
 
+interface IList {
+    title: string;
+    text: string;
+}
+
+const ListItem = ({ title, text }: IList) => {
+    const [show, setShow] = useState(false);
+    const toggle = () => {
+        setShow(!show);
+    };
+    const textArr = text.split("\n");
+    return (
+        <Question layout onClick={toggle} initial={{ borderRadius: 10 }}>
+            <QuestionTitle layout>
+                <div>{title}</div>
+                <div>➕</div>
+            </QuestionTitle>
+            <AnimatePresence>
+                {show && (
+                    <Answer initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} layout>
+                        <span>
+                            {textArr.map((data) => {
+                                return (
+                                    <p>
+                                        {data}
+                                        <br></br>
+                                    </p>
+                                );
+                            })}
+                            {}
+                        </span>
+                    </Answer>
+                )}
+            </AnimatePresence>
+        </Question>
+    );
+};
+
 const Main = styled.div`
     box-sizing: border-box;
     width: 100vw;
-    height: 270vh;
+    height: 280vh;
     h1 {
         color: white;
         font-size: 5vw;
@@ -171,7 +161,7 @@ const Text = styled.div`
 `;
 
 const Contents = styled.div`
-    height: 170vh;
+    height: 180vh;
     width: 100%;
     background-color: black;
 `;
@@ -226,42 +216,39 @@ const SectionOne = styled.div`
 
 const SectionTwo = styled.div`
     width: 100%;
-    height: 70vh;
+    height: 100vh;
     border-bottom: 1vw solid ${(props) => props.theme.black.darker};
 `;
 
-const Col = styled(motion.div)`
+const Col = styled(motion.ul)`
     margin-top: 10vh;
     width: 100%;
     font-size: 2vw;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     color: white;
-    background: linear-gradient(135deg, #ff0000, #2600ff);
 `;
 
-const Question = styled(motion.div)`
-    text-align: center;
-    line-height: 10vh;
-    background-color: ${(props) => props.theme.black.darker};
+const Question = styled(motion.li)`
     width: 50%;
+    margin: 0 auto;
+    background-color: ${(props) => props.theme.black.lighter};
+    margin-bottom: 1vh;
+`;
+
+const QuestionTitle = styled(motion.div)`
     height: 10vh;
+    display: flex;
+    padding: 0 2vw;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 const Answer = styled(motion.div)`
-    box-sizing: border-box;
-    width: 50%;
-    height: 30vh;
-    text-align: center;
-    display: flex;
-    z-index: 10;
-    border: 1px solid blue;
-`;
-
-const Test = styled(motion.div)`
-    background-color: white;
     width: 100%;
-    height: 30vh;
+    box-sizing: border-box;
+    color: ${(props) => props.theme.white.darker};
+    border-top: 3px solid black;
+    margin-top: 2vh;
+    padding: 30px;
 `;
