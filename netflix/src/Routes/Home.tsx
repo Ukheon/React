@@ -21,7 +21,7 @@ const Home = () => {
             <Header>
                 <Text>
                     <h1>
-                        영화와 시리즈 정보를
+                        영화의 정보를
                         <br></br>
                         무료로 볼 수 있는.
                     </h1>
@@ -110,7 +110,7 @@ const ListItem = ({ title, text }: IList) => {
 const Main = styled.div`
     box-sizing: border-box;
     width: 100vw;
-    height: 280vh;
+    height: 200vh;
     h1 {
         color: white;
         font-size: 5vw;
@@ -216,8 +216,7 @@ const SectionOne = styled.div`
 
 const SectionTwo = styled.div`
     width: 100%;
-    height: 100vh;
-    border-bottom: 1vw solid ${(props) => props.theme.black.darker};
+    height: 10vh;
 `;
 
 const Col = styled(motion.ul)`

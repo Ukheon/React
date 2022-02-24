@@ -68,7 +68,13 @@ const HomeItem = ({ data, tag, unique }: IData) => {
                 </LeftArrow>
                 <AnimatePresence initial={false} onExitComplete={() => setWaitClick(false)} custom={clickSencor}>
                     {unique === params.key && params.movieId ? (
-                        <MovieDetail data={data} movieId={params.movieId} unique={unique} type={"movie"}></MovieDetail>
+                        <MovieDetail
+                            data={data}
+                            movieId={params.movieId}
+                            from="movie"
+                            unique={unique}
+                            type={"movie"}
+                        ></MovieDetail>
                     ) : null}
                     <Row
                         custom={clickSencor}

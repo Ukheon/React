@@ -92,10 +92,10 @@ const Header = () => {
                             <Link to="/movies">Movies</Link>
                             {isMovies ? <NavBorder layoutId="navBorder" /> : null}
                         </Item>
-                        <Item key="3">
+                        {/* <Item key="3">
                             <Link to="/tv">Tv Show</Link>
                             {isTv ? <NavBorder layoutId="navBorder" /> : null}
-                        </Item>
+                        </Item> */}
                     </AnimatePresence>
                 </Items>
             </Col>

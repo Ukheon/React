@@ -7,17 +7,18 @@ import MovieDetail from "../Movie/MovieDetail";
 interface IPostDetail {
     id: number;
     type: string;
+    keyword: string;
 }
 
-const PostDetail = ({ id, type }: IPostDetail) => {
+const PostDetail = ({ id, type, keyword }: IPostDetail) => {
     const { data, isLoading } = useQuery(["SearchDetail", `${id}`], () => getSearchDetail(id + "", type));
     const { data: video, isLoading: videoLoading } = useQuery(["SearchVideo", `Video${id}`], () =>
         getVideos(id + "", type)
     );
     const loading = isLoading || videoLoading;
     if (loading) <div></div>;
-    console.log(data);
-    return <MovieDetail movieId={id + ""} unique="post" type={type}></MovieDetail>;
+
+    return <MovieDetail movieId={id + ""} unique="post" from="search" keyword={keyword} type={type}></MovieDetail>;
 };
 
 export default PostDetail;

@@ -12,9 +12,11 @@ import { useSetRecoilState } from "recoil";
 interface IData {
     data: IMovieNow;
     tag?: string;
+    from: string;
+    keyword?: string;
 }
 
-const MoviesBox = ({ data, tag }: IData) => {
+const MoviesBox = ({ data, tag, from }: IData) => {
     const setClickHidden = useSetRecoilState(HiddenState);
     const setArrowHidden = useSetRecoilState(HiddenArrow);
     const setSimilar = useSetRecoilState(ShowSimilar);
@@ -22,12 +24,13 @@ const MoviesBox = ({ data, tag }: IData) => {
     let Arr: number[] = [];
     for (let i = 0; i < Math.floor(data!.results.length / 6); i++) Arr.push(i);
 
-    const similarEvent = (event: React.MouseEvent<HTMLDivElement>, id: number) => {
+    const similarEvent = (event: React.MouseEvent<HTMLDivElement>, id: number, title: string) => {
         event.stopPropagation();
         setArrowHidden(true);
         setClickHidden(true);
         setSimilar(false);
-        navigate(`/search?keyword=학교&id=${id}`);
+        if (from === "movie") navigate(`/movies/1key/${id}`);
+        else if (from === "search") navigate(`/search?keyword=${title}&id=${id}`);
     };
 
     return (
@@ -45,7 +48,7 @@ const MoviesBox = ({ data, tag }: IData) => {
                         <Box
                             layoutId={data.id + ""}
                             onClick={(event) => {
-                                similarEvent(event, data.id, data.);
+                                similarEvent(event, data.id, data.title);
                             }}
                             key={index}
                             variants={boxVariants}

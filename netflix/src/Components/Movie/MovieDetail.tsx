@@ -14,6 +14,8 @@ interface IDetail {
     data?: IMovieNow;
     unique: string;
     type: string;
+    from: string;
+    keyword?: string;
 }
 
 interface IVideoResult {
@@ -42,7 +44,7 @@ interface IMovieDetail {
     first_air_date: string;
 }
 
-const MovieDetail = ({ movieId, unique, type }: IDetail) => {
+const MovieDetail = ({ movieId, unique, type, from, keyword }: IDetail) => {
     const { data: videoData, isLoading } = useQuery<IVideo>(["Movie", `video${movieId}ko`], () => {
         return getVideos(movieId, type);
     });
@@ -78,7 +80,9 @@ const MovieDetail = ({ movieId, unique, type }: IDetail) => {
                 backgroundColor: "rgba(0,0,0,0)",
             }}
             onClick={() => {
-                Navigate(-1);
+                if (from === "movie") Navigate("/movies");
+                else if (from === "search") Navigate(`/search?keyword=${keyword}`);
+
                 setHidden(false);
                 setArrowHidden(false);
                 setShowSimilar(false);
@@ -150,7 +154,7 @@ const MovieDetail = ({ movieId, unique, type }: IDetail) => {
                     </ExplainSoft>
                 </TextDetail>
             </ShowDetail>
-            {showSimilar ? <Similar movieId={movieId}></Similar> : ""}
+            {showSimilar ? <Similar from={from} movieId={movieId}></Similar> : ""}
         </Movies>
     );
 };

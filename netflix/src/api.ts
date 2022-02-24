@@ -33,12 +33,12 @@ export const getMovies = async () => {
     return await fetch(`${BASE_URL}movie/now_playing?api_key=${API_KEY}&${REGION_URL}`).then((res) => res.json());
 };
 
-export const getMoviesTopRate = async () => {
-    return await fetch(`${BASE_URL}movie/top_rated?api_key=${API_KEY}&${REGION_URL2}`).then((res) => res.json());
+export const getTopRate = async (type: string) => {
+    return await fetch(`${BASE_URL}${type}/top_rated?api_key=${API_KEY}&${REGION_URL2}`).then((res) => res.json());
 };
 
-export const getMoviesPopular = async () => {
-    return await fetch(`${BASE_URL}movie/popular?api_key=${API_KEY}&${REGION_URL}`).then((res) => res.json());
+export const getPopular = async (type: string) => {
+    return await fetch(`${BASE_URL}${type}/popular?api_key=${API_KEY}&${REGION_URL}`).then((res) => res.json());
 };
 
 export const getMoviesUpcoming = async () => {

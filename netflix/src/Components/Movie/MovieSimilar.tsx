@@ -8,9 +8,10 @@ import { ShowSimilar } from "../../Atom";
 import { useState } from "react";
 interface ISimilar {
     movieId: string;
+    from: string;
 }
 
-const Similar = ({ movieId }: ISimilar) => {
+const Similar = ({ movieId, from }: ISimilar) => {
     const { data, isLoading } = useQuery(["Movies", `Similar${movieId}`], () => getMoviesSimilar(movieId));
     const setShowSimilar = useSetRecoilState(ShowSimilar);
     if (isLoading) return <div></div>;
@@ -21,7 +22,7 @@ const Similar = ({ movieId }: ISimilar) => {
     return (
         <Main onClick={toggleClick}>
             <Row>
-                <MoviesBox data={data}></MoviesBox>
+                <MoviesBox from={from} data={data}></MoviesBox>
             </Row>
         </Main>
     );

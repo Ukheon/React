@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getMovies, getMoviesPopular, getMoviesTopRate, getMoviesUpcoming, IMovieNow } from "../api";
+import { getMovies, getMoviesUpcoming, getPopular, getTopRate, IMovieNow } from "../api";
 import styled from "styled-components";
 import { makeImage } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,8 +10,12 @@ import HomeItem from "../Components/Movie/MovieSlider";
 
 const Movie = () => {
     const { data, isLoading: nowLoading } = useQuery<IMovieNow>(["Movies", "nowPlaying"], getMovies);
-    const { data: topRated, isLoading: rateLoading } = useQuery<IMovieNow>(["Movies", "topRated"], getMoviesTopRate);
-    const { data: popular, isLoading: popularLoading } = useQuery<IMovieNow>(["Movies", "popular"], getMoviesPopular);
+    const { data: topRated, isLoading: rateLoading } = useQuery<IMovieNow>(["Movies", "topRated"], () =>
+        getTopRate("movie")
+    );
+    const { data: popular, isLoading: popularLoading } = useQuery<IMovieNow>(["Movies", "popular"], () =>
+        getPopular("movie")
+    );
     const loading = nowLoading || rateLoading || popularLoading;
     return (
         <Main>
